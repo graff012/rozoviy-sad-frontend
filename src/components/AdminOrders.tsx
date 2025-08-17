@@ -1,0 +1,300 @@
+import { useState, useEffect } from "react";
+import { API_URL } from "../config";
+
+// Type for API response: has flower.name
+interface ApiOrderItem {
+  quantity: number;
+  price: number;
+  flower: {
+    name: string;
+  };
+}
+
+interface ApiOrder {
+  id: string;
+  name: string;
+  phone_number: string;
+  address: string;
+  telegram_username: string;
+  status: 'pending' | 'processing' | 'completed' | 'cancelled';
+  created_at: string;
+  items: ApiOrderItem[];
+}
+
+// Frontend type: has item.name (already extracted)
+interface OrderItem {
+  name: string;
+  quantity: number;
+  price: number;
+  total: number;
+}
+
+interface OrderType {
+  id: string;
+  customer: {
+    name: string;
+    phone: string;
+    address: string;
+    telegram_username: string;
+  };
+  items: OrderItem[];
+  total: number;
+  date: string;
+  status: 'pending' | 'processing' | 'completed' | 'cancelled';
+}
+
+interface OrderItemProps {
+  order: OrderType;
+  onStatusChange: (orderId: string, status: string) => void;
+}
+
+const OrderItem = ({ order, onStatusChange }: OrderItemProps) => {
+  return (
+    <>
+      {/* Mobile Card View */}
+      <div className="sm:hidden p-4 border-b border-[#f0e5ef] hover:bg-[#fff7fa] transition">
+        <div className="flex justify-between items-start mb-2">
+          <div>
+            <span className="font-semibold text-black">#{order.id}</span>
+          </div>
+          <div className="text-right">
+            <div className="text-sm text-gray-500">{new Date(order.date).toLocaleString()}</div>
+          </div>
+        </div>
+
+        <div className="mb-3">
+          <div className="font-medium text-black">{order.customer.name}</div>
+          <div className="text-sm text-gray-500">{order.customer.phone}</div>
+          <div className="text-sm text-gray-500 truncate">{order.customer.address}</div>
+          {order.customer.telegram_username && (
+            <div className="text-sm text-gray-500">@{order.customer.telegram_username}</div>
+          )}
+        </div>
+
+        <div className="mb-3">
+          <div className="text-sm font-medium text-gray-700">Mahsulotlar:</div>
+          {order.items.map((item, i) => (
+            <div key={i} className="text-sm text-black">
+              {item.quantity} x {item.name} — {item.total.toLocaleString()} UZS
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-between items-center mb-3">
+          <div className="font-medium text-black">{order.total.toLocaleString()} UZS</div>
+          <select
+            value={order.status}
+            onChange={(e) => onStatusChange(order.id, e.target.value)}
+            className={`text-xs px-2 py-1 rounded-full font-medium ${order.status === 'completed'
+                ? 'bg-green-100 text-green-800'
+                : order.status === 'processing'
+                  ? 'bg-yellow-100 text-yellow-800'
+                  : order.status === 'cancelled'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-blue-100 text-blue-800'
+              }`}
+          >
+            <option value="pending">Kutilmoqda</option>
+            <option value="processing">Jarayonda</option>
+            <option value="completed">Yakunlangan</option>
+            <option value="cancelled">Bekor qilingan</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Desktop Table Row */}
+      <div className="hidden sm:flex items-center px-6 py-4 hover:bg-[#fff7fa] transition text-sm">
+        <div className="w-1/6 font-medium text-black">{`#${order.id}`}</div>
+        <div className="w-1/4 text-black">
+          <div className="font-medium truncate">{order.customer.name}</div>
+          <div className="text-xs text-gray-500 truncate">{order.customer.phone}</div>
+          <div className="text-xs text-gray-500 truncate">{order.customer.address}</div>
+          {order.customer.telegram_username && (
+            <div className="text-xs text-gray-500">@{order.customer.telegram_username}</div>
+          )}
+        </div>
+        <div className="w-1/5 text-black">
+          {order.items.map((item, i) => (
+            <div key={i} className="text-xs truncate">
+              {item.quantity}x {item.name}  {/* ✅ Fixed: use item.name */}
+            </div>
+          ))}
+        </div>
+        <div className="w-1/5 font-medium text-black">{order.total.toLocaleString()} UZS</div>
+        <div className="w-1/5">
+          <select
+            value={order.status}
+            onChange={(e) => onStatusChange(order.id, e.target.value)}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium min-w-[100px] ${order.status === 'completed'
+                ? 'bg-green-100 text-green-800'
+                : order.status === 'processing'
+                  ? 'bg-yellow-100 text-yellow-800'
+                  : order.status === 'cancelled'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-blue-100 text-blue-800'
+              }`}
+          >
+            <option value="pending">Kutilmoqda</option>
+            <option value="processing">Jarayonda</option>
+            <option value="completed">Yakunlangan</option>
+            <option value="cancelled">Bekor qilingan</option>
+          </select>
+        </div>
+        <div className="w-1/6 text-xs text-gray-500 whitespace-nowrap">
+          {new Date(order.date).toLocaleString()}
+        </div>
+      </div>
+    </>
+  );
+};
+
+export const AdminOrders: React.FC = () => {
+  const [orders, setOrders] = useState<OrderType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_URL}/orders`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+
+      const rawData = await response.json();
+      console.log("Raw API response:", rawData);
+
+      const apiOrders: ApiOrder[] = Array.isArray(rawData)
+        ? rawData
+        : rawData.orders || [];
+
+      const mappedOrders: OrderType[] = apiOrders.map((order) => {
+        const items = (order.items || []).map((item) => ({
+          name: item.flower?.name || "Noma'lum mahsulot", // ✅ Extract name here
+          quantity: item.quantity || 1,
+          price: item.price || 0,
+          total: (item.quantity || 0) * (item.price || 0),
+        }));
+
+        const total = items.reduce((sum, item) => sum + item.total, 0);
+
+        return {
+          id: order.id,
+          customer: {
+            name: order.name || "Noma'lum",
+            phone: order.phone_number || "Noma'lum",
+            address: order.address || "Manzil kiritilmagan",
+            telegram_username: order.telegram_username || "",
+          },
+          items,
+          total,
+          date: order.created_at || new Date().toISOString(),
+          status: order.status || 'pending',
+        };
+      });
+
+      setOrders(mappedOrders);
+    } catch (err) {
+      console.error("Failed to fetch orders:", err);
+      setError("Buyurtmalarni yuklashda xatolik yuz berdi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const handleStatusChange = async (orderId: string, newStatus: string) => {
+    try {
+      const response = await fetch(`${API_URL}/orders/${orderId}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (response.ok) {
+        setOrders((prev) =>
+          prev.map((order) =>
+            order.id === orderId ? { ...order, status: newStatus as any } : order
+          )
+        );
+        alert("Holat muvaffaqiyatli yangilandi!");
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Status update failed:", errorData);
+        alert("Holatni yangilashda xatolik yuz berdi.");
+      }
+    } catch (err) {
+      console.error("Network error:", err);
+      alert("Tarmoqda xatolik. Internetni tekshiring.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-10">
+        <div className="text-gray-600">Yuklanmoqda...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8 text-red-600">
+        {error}
+        <button
+          onClick={fetchOrders}
+          className="ml-4 text-sm bg-pink-500 text-white px-3 py-1 rounded"
+        >
+          Qayta urinish
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center justify-center py-8 px-4 sm:py-10">
+      <div className="bg-[#fff4f7] rounded-xl shadow-lg w-full max-w-[900px] p-5 sm:p-8">
+        <h2 className="text-xl sm:text-2xl font-bold mb-6 text-black text-center sm:text-left">
+          Buyurtmalarni boshqarish
+        </h2>
+
+        <div className="bg-white rounded-lg shadow border border-[#f0e5ef] overflow-hidden">
+          {/* Header */}
+          <div className="hidden sm:flex bg-[#fdf6f9] border-b border-[#f0e5ef] text-black font-semibold px-6 py-3 text-sm">
+            <div className="w-1/6">Buyurtma</div>
+            <div className="w-1/4">Mijoz</div>
+            <div className="w-1/5">Mahsulotlar</div>
+            <div className="w-1/5">Jami</div>
+            <div className="w-1/5">Holati</div>
+            <div className="w-1/6">Sana</div>
+          </div>
+
+          <div className="divide-y divide-[#f0e5ef]">
+            {orders.length === 0 ? (
+              <div className="px-4 py-6 text-center text-gray-500 text-sm">
+                Hozircha buyurtmalar mavjud emas.
+              </div>
+            ) : (
+              orders.map((order) => (
+                <OrderItem
+                  key={order.id}
+                  order={order}
+                  onStatusChange={handleStatusChange}
+                />
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
