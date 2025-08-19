@@ -23,6 +23,10 @@ type Flower = {
   price: string;
 };
 
+// Create base URL for static files (remove /api from API_URL)
+const BASE_URL = API_URL.replace('/api', '');
+console.log(BASE_URL)
+
 export const AdminPanel = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<
@@ -46,6 +50,18 @@ export const AdminPanel = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [flowerIdToDelete, setFlowerIdToDelete] = useState<string | null>(null);
+
+  // Helper function to construct image URL
+  const getImageUrl = (imgUrl: string) => {
+    if (!imgUrl) return '';
+
+    // If imgUrl already starts with 'images/', use it as is
+    // If it's just a filename, prepend 'images/'
+    const imagePath = imgUrl.startsWith('images/') ? imgUrl : `images/${imgUrl}`;
+
+    // Construct full URL
+    return `${BASE_URL}/${imagePath}`;
+  };
 
   // Log active tab changes
   useEffect(() => {
@@ -310,15 +326,22 @@ export const AdminPanel = () => {
       } else {
         const formDataToSend = new FormData();
 
+        // Make sure all field names match your DTO exactly
         formDataToSend.append("name", formData.name.trim());
-        formDataToSend.append("smell", formData.smell);
-        formDataToSend.append("flower_size", formData.flowerSize);
-        formDataToSend.append("height", formData.height);
-        formDataToSend.append("category_id", formData.categoryId);
+        formDataToSend.append("smell", formData.smell || "");
+        formDataToSend.append("flowerSize", formData.flowerSize || ""); // Keep consistent
+        formDataToSend.append("height", formData.height || "");
+        formDataToSend.append("categoryId", formData.categoryId);
         formDataToSend.append("price", formData.price);
 
         if (formData.imageFile) {
           formDataToSend.append("image", formData.imageFile);
+        }
+
+        // Debug: Log what we're sending
+        console.log("FormData contents:");
+        for (const [key, value] of formDataToSend.entries()) {
+          console.log(key, value);
         }
 
         const res = await fetch(`${API_URL}/flowers/create`, {
@@ -329,7 +352,7 @@ export const AdminPanel = () => {
 
         if (res.ok) {
           console.log("Flower created successfully");
-          await fetchFlowers(); // Refresh the flowers list
+          await fetchFlowers();
           // Reset form
           setFormData({
             name: "",
@@ -341,9 +364,7 @@ export const AdminPanel = () => {
             price: "",
           });
           // Reset file input
-          const fileInput = document.querySelector(
-            'input[type="file"]'
-          ) as HTMLInputElement;
+          const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
           if (fileInput) {
             fileInput.value = "";
           }
@@ -351,7 +372,15 @@ export const AdminPanel = () => {
         } else {
           const errorText = await res.text();
           console.error("Failed to add flower:", res.status, errorText);
-          alert(`Failed to add flower: ${res.status}. Please try again.`);
+
+          // Try to parse error as JSON for better debugging
+          try {
+            const errorJson = JSON.parse(errorText);
+            console.error("Parsed error:", errorJson);
+            alert(`Failed to add flower: ${errorJson.message || errorText}`);
+          } catch {
+            alert(`Failed to add flower: ${res.status}. ${errorText}`);
+          }
         }
       }
     } catch (error) {
@@ -374,7 +403,7 @@ export const AdminPanel = () => {
     formDataToSend.append("category_id", formData.categoryId);
     formDataToSend.append("smell", formData.smell);
     formDataToSend.append("height", formData.height);
-    formDataToSend.append("flower_size", formData.flowerSize);
+    formDataToSend.append("flowerSize", formData.flowerSize);
     if (formData.imageFile) {
       formDataToSend.append("image", formData.imageFile);
     }
@@ -717,52 +746,60 @@ export const AdminPanel = () => {
                   {flowers.length === 0 ? (
                     <div className="px-4 py-4 text-center text-gray-500">No flowers added yet.</div>
                   ) : (
-                    flowers.map((flower) => (
-                      <div
-                        key={flower.id}
-                        className="border-b border-[#f0e5ef] p-4 hover:bg-[#fff7fa] transition"
-                      >
-                        <div className="flex items-center gap-x-3 mb-2">
-                          {flower.imgUrl && (
-                            <img
-                              src={`http://localhost:4000${flower.imgUrl}`}
-                              alt={flower.name}
-                              className="w-12 h-12 object-cover rounded-md"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).style.display = 'none';
-                              }}
-                            />
-                          )}
-                          <div>
-                            <div className="font-medium text-black">{flower.name}</div>
-                            <div className="text-sm text-gray-600">${flower.price}</div>
+                    flowers.map((flower) => {
+                      const imageUrl = flower.imgUrl ? getImageUrl(flower.imgUrl) : '';
+                      console.log('Mobile - Flower:', flower.name, 'imgUrl:', flower.imgUrl, 'Final URL:', imageUrl);
+
+                      return (
+                        <div
+                          key={flower.id}
+                          className="border-b border-[#f0e5ef] p-4 hover:bg-[#fff7fa] transition"
+                        >
+                          <div className="flex items-center gap-x-3 mb-2">
+                            {flower.imgUrl && (
+                              <img
+                                src={imageUrl}
+                                alt={flower.name}
+                                className="w-12 h-12 object-cover rounded-md"
+                                onLoad={() => console.log('✅ Image loaded successfully:', imageUrl)}
+                                onError={(e) => {
+                                  console.error('❌ Image failed to load:', imageUrl);
+                                  console.error('Error event:', e);
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
+                              />
+                            )}
+                            <div>
+                              <div className="font-medium text-black">{flower.name}</div>
+                              <div className="text-sm text-gray-600">${flower.price}</div>
+                            </div>
+                          </div>
+                          <div className="text-sm text-black mb-1">
+                            <strong>Size:</strong> {flower.flowerSize || "–"}
+                          </div>
+                          <div className="text-sm text-black mb-1">
+                            <strong>Smell:</strong> {flower.smell || "–"}
+                          </div>
+                          <div className="text-sm text-black mb-2">
+                            <strong>Height:</strong> {flower.height || "–"}
+                          </div>
+                          <div className="flex gap-x-2">
+                            <button
+                              onClick={() => handleEditClick(flower)}
+                              className="text-xs sm:text-sm bg-[#fdf6f9] hover:bg-[#ffe3f0] text-black px-3 py-1 rounded transition"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(flower.id)}
+                              className="text-xs sm:text-sm bg-[#ffeef0] hover:bg-red-200 text-[#e57373] px-3 py-1 rounded transition"
+                            >
+                              Delete
+                            </button>
                           </div>
                         </div>
-                        <div className="text-sm text-black mb-1">
-                          <strong>Size:</strong> {flower.flowerSize || "–"}
-                        </div>
-                        <div className="text-sm text-black mb-1">
-                          <strong>Smell:</strong> {flower.smell || "–"}
-                        </div>
-                        <div className="text-sm text-black mb-2">
-                          <strong>Height:</strong> {flower.height || "–"}
-                        </div>
-                        <div className="flex gap-x-2">
-                          <button
-                            onClick={() => handleEditClick(flower)}
-                            className="text-xs sm:text-sm bg-[#fdf6f9] hover:bg-[#ffe3f0] text-black px-3 py-1 rounded transition"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(flower.id)}
-                            className="text-xs sm:text-sm bg-[#ffeef0] hover:bg-red-200 text-[#e57373] px-3 py-1 rounded transition"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    ))
+                      )
+                    })
                   )}
                 </div>
 
@@ -773,48 +810,56 @@ export const AdminPanel = () => {
                       No flowers added yet.
                     </div>
                   ) : (
-                    flowers.map((flower) => (
-                      <div
-                        key={flower.id}
-                        className="flex items-center px-6 py-4 hover:bg-[#fff7fa] transition"
-                      >
-                        <div className="w-1/4 flex items-center gap-x-3 text-black">
-                          {flower.imgUrl && (
-                            <img
-                              src={`http://localhost:4000${flower.imgUrl}`}
-                              alt={flower.name}
-                              className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-md"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).style.display = 'none';
-                              }}
-                            />
-                          )}
-                          <div>
-                            <div className="font-medium">{flower.name}</div>
-                            <div className="text-sm text-gray-600">${flower.price}</div>
+                    flowers.map((flower) => {
+                      const imageUrl = flower.imgUrl ? getImageUrl(flower.imgUrl) : '';
+                      console.log('Desktop - Flower:', flower.name, 'imgUrl:', flower.imgUrl, 'Final URL:', imageUrl);
+
+                      return (
+                        <div
+                          key={flower.id}
+                          className="flex items-center px-6 py-4 hover:bg-[#fff7fa] transition"
+                        >
+                          <div className="w-1/4 flex items-center gap-x-3 text-black">
+                            {flower.imgUrl && (
+                              <img
+                                src={imageUrl}
+                                alt={flower.name}
+                                className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-md"
+                                onLoad={() => console.log('✅ Desktop image loaded successfully:', imageUrl)}
+                                onError={(e) => {
+                                  console.error('❌ Desktop image failed to load:', imageUrl);
+                                  console.error('Error event:', e);
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
+                              />
+                            )}
+                            <div>
+                              <div className="font-medium">{flower.name}</div>
+                              <div className="text-sm text-gray-600">${flower.price}</div>
+                            </div>
+                          </div>
+                          <div className="w-1/4 text-black">
+                            <div>{flower.flowerSize || "–"}</div>
+                            <div className="text-sm text-gray-600">{flower.smell || "–"}</div>
+                          </div>
+                          <div className="w-1/4 text-black">{flower.height || "–"}</div>
+                          <div className="w-1/4 flex gap-x-2">
+                            <button
+                              onClick={() => handleEditClick(flower)}
+                              className="text-sm bg-[#fdf6f9] hover:bg-[#ffe3f0] text-black px-3 py-1 rounded transition"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(flower.id)}
+                              className="text-sm bg-[#ffeef0] hover:bg-red-200 text-[#e57373] px-3 py-1 rounded transition"
+                            >
+                              Delete
+                            </button>
                           </div>
                         </div>
-                        <div className="w-1/4 text-black">
-                          <div>{flower.flowerSize || "–"}</div>
-                          <div className="text-sm text-gray-600">{flower.smell || "–"}</div>
-                        </div>
-                        <div className="w-1/4 text-black">{flower.height || "–"}</div>
-                        <div className="w-1/4 flex gap-x-2">
-                          <button
-                            onClick={() => handleEditClick(flower)}
-                            className="text-sm bg-[#fdf6f9] hover:bg-[#ffe3f0] text-black px-3 py-1 rounded transition"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(flower.id)}
-                            className="text-sm bg-[#ffeef0] hover:bg-red-200 text-[#e57373] px-3 py-1 rounded transition"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    ))
+                      )
+                    })
                   )}
                 </div>
               </div>

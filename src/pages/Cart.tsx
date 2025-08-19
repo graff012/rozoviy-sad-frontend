@@ -18,6 +18,23 @@ interface FormData {
   address: string;
 }
 
+const BASE_URL = API_URL.replace("api", "");
+
+// Helper function to construct proper image URL
+const getImageUrl = (imgUrl: string | undefined): string => {
+  if (!imgUrl) {
+    return "/placeholder.jpg"; // Fallback to placeholder if no URL
+  }
+  if (imgUrl.startsWith("http")) {
+    return imgUrl; // Return full URL if it’s already absolute
+  }
+  const cleanPath = imgUrl.startsWith("/") ? imgUrl.slice(1) : imgUrl;
+  const imgPath = cleanPath.startsWith("images") ? cleanPath : `images/${cleanPath}`;
+  const fullUrl = `${BASE_URL}/${imgPath}`;
+  console.log(`Image URL construction - Input: "${imgUrl}" -> Output: "${fullUrl}"`);
+  return fullUrl;
+};
+
 const Cart = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
@@ -48,15 +65,15 @@ const Cart = () => {
 
   // PDF generation (unchanged)
   const generateOrderPDF = async () => {
-    const { jsPDF } = await import('jspdf');
+    const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
 
     doc.setFontSize(20);
     doc.setTextColor(40, 40, 40);
-    doc.text("Rozoviy Sad", 105, 20, { align: 'center' });
+    doc.text("Rozoviy Sad", 105, 20, { align: "center" });
 
     doc.setFontSize(14);
-    doc.text("Buyurtma xati", 105, 30, { align: 'center' });
+    doc.text("Buyurtma xati", 105, 30, { align: "center" });
 
     doc.setFontSize(12);
     doc.text(`Mijoz: ${formData.firstName}`, 20, 50);
@@ -65,33 +82,37 @@ const Cart = () => {
     doc.text(`Manzil: ${formData.address}`, 20, 80);
 
     doc.setFillColor(200, 200, 200);
-    doc.rect(20, 95, 170, 10, 'F');
+    doc.rect(20, 95, 170, 10, "F");
     doc.setTextColor(0, 0, 0);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Nomi', 25, 102);
-    doc.text('Narxi', 100, 102);
-    doc.text('Soni', 140, 102);
-    doc.text('Jami', 170, 102, { align: 'right' });
+    doc.setFont("helvetica", "bold");
+    doc.text("Nomi", 25, 102);
+    doc.text("Narxi", 100, 102);
+    doc.text("Soni", 140, 102);
+    doc.text("Jami", 170, 102, { align: "right" });
 
-    doc.setFont('helvetica', 'normal');
+    doc.setFont("helvetica", "normal");
     let yPosition = 110;
     cartItems.forEach((item) => {
       const itemTotal = Number(item.price) * item.quantity;
       doc.text(item.name, 25, yPosition);
       doc.text(`${Number(item.price).toLocaleString()} UZS`, 100, yPosition);
       doc.text(item.quantity.toString(), 140, yPosition);
-      doc.text(itemTotal.toLocaleString() + ' UZS', 170, yPosition, { align: 'right' });
+      doc.text(itemTotal.toLocaleString() + " UZS", 170, yPosition, {
+        align: "right",
+      });
       yPosition += 10;
     });
 
-    doc.setFont('helvetica', 'bold');
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
-    doc.text('Umumiy summa:', 100, yPosition + 20);
-    doc.text(`${cartTotal.toLocaleString()} UZS`, 170, yPosition + 20, { align: 'right' });
+    doc.text("Umumiy summa:", 100, yPosition + 20);
+    doc.text(`${cartTotal.toLocaleString()} UZS`, 170, yPosition + 20, {
+      align: "right",
+    });
 
-    doc.setFont('helvetica', 'normal');
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(11);
-    doc.text(`Quyidagi karta raqamiga to'lov qiling`, 20, yPosition + 40)
+    doc.text(`Quyidagi karta raqamiga to'lov qiling`, 20, yPosition + 40);
     doc.text(`Karta raqami: ${CARD_NUMBER}`, 20, yPosition + 50);
     doc.setFontSize(12);
     doc.text(`To'lov muddati: 10 kun ichida`, 20, yPosition + 60);
@@ -108,7 +129,12 @@ const Cart = () => {
     setError(null);
 
     // Validate form
-    if (!formData.firstName || !formData.telegram_username || !formData.phoneNumber || !formData.address) {
+    if (
+      !formData.firstName ||
+      !formData.telegram_username ||
+      !formData.phoneNumber ||
+      !formData.address
+    ) {
       setError("Iltimos, barcha maydonlarni to'ldiring");
       setIsSubmitting(false);
       return;
@@ -133,7 +159,9 @@ const Cart = () => {
       if (!orderResponse.ok) {
         const errorText = await orderResponse.text();
         console.error("Order creation failed:", errorText);
-        throw new Error(`Failed to create order: ${orderResponse.status} ${errorText}`);
+        throw new Error(
+          `Failed to create order: ${orderResponse.status} ${errorText}`
+        );
       }
 
       const { order: createdOrder } = await orderResponse.json();
@@ -266,9 +294,12 @@ const Cart = () => {
                         <div key={item.id} className="py-4 flex">
                           <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                             <img
-                              src={item.imgUrl || "/placeholder.jpg"}
+                              src={getImageUrl(item.imgUrl)}
                               alt={item.name}
                               className="h-full w-full object-cover object-center"
+                              onError={(e) => {
+                                e.currentTarget.src = "/placeholder.jpg"; // Fallback if image fails to load concentre
+                              }}
                             />
                           </div>
 
@@ -408,7 +439,9 @@ const Cart = () => {
                         disabled={isSubmitting}
                         className="w-full bg-gradient-to-r from-pink-500 to-pink-600 text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-70 disabled:cursor-not-allowed"
                       >
-                        {isSubmitting ? "Buyurtma qilinmoqda..." : "Buyurtma berish"}
+                        {isSubmitting
+                          ? "Buyurtma qilinmoqda..."
+                          : "Buyurtma berish"}
                       </button>
                     </div>
                   </div>

@@ -34,7 +34,7 @@ const FlowerDetail = () => {
     }
     // Remove leading slash if it exists to avoid double slashes
     const cleanPath = imgUrl.startsWith("/") ? imgUrl.slice(1) : imgUrl;
-    return `http://localhost:4000/${cleanPath}`;
+    return `${API_URL.replace('/api', '')}/${cleanPath}`;
   };
 
   // Handle like functionality with server sync

@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useCart } from "../contexts/CartContext";
 import { FaArrowLeft, FaShare } from "react-icons/fa6";
+import { API_URL } from "../config";
 
 interface Flower {
   id: string;
@@ -25,24 +26,29 @@ const FlowerDetail = () => {
   const navigate = useNavigate();
   const { addToCart, cartItems } = useCart();
 
+
+  const BASE_URL = API_URL.replace("api", "")
+
   // Helper function to construct proper image URL
   const getImageUrl = (imgUrl: string | undefined): string => {
     if (!imgUrl) {
-      return "/images/placeholder.jpg";
+      return "";
     }
     if (imgUrl.startsWith("http")) {
       return imgUrl;
     }
-    const baseUrl = "http://localhost:4000"; // Correct base URL
     const cleanPath = imgUrl.startsWith("/") ? imgUrl.slice(1) : imgUrl;
-    return `${baseUrl}/${cleanPath}`;
+    const imgPath = cleanPath.startsWith("images") ? cleanPath : `images/${cleanPath}`
+    const fullUrl = `${BASE_URL}/${imgPath}`
+    console.log(`Image URL construction - Input: "${imgUrl}" -> Output: "${fullUrl}"`);
+    return fullUrl
   };
 
   // Fetch flower details
   useEffect(() => {
     const fetchFlower = async () => {
       try {
-        const response = await fetch(`http://localhost:4000/api/flowers/${id}`, {
+        const response = await fetch(`${API_URL}/flowers/${id}`, {
           // Removed: credentials & Authorization header
           headers: {
             "Content-Type": "application/json",
