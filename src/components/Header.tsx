@@ -2,7 +2,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { IoSearchSharp } from "react-icons/io5";
 import {
   FaCartShopping,
-  FaHeart,
   FaPhone,
   FaUserShield,
   FaBars,
