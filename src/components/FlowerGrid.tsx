@@ -289,7 +289,7 @@ const FlowerGrid = ({ searchTerm }: FlowerGridProps) => {
                         id: flower.id,
                         name: flower.name,
                         price: flower.price,
-                        imgUrl: flower.imgUrl,
+                        imgUrl: flower.imgUrl as string,
                       });
                       setAddedToCart((prev) => ({ ...prev, [flower.id]: true }));
                     }}
