@@ -215,7 +215,7 @@ const FlowerGrid = ({ searchTerm }: FlowerGridProps) => {
                 <div className="relative overflow-hidden">
                   {flower.imgUrl && !imageErrors[flower.id] ? (
                     <img
-                      src={flower.imgUrl}
+                      src={flower.imgUrl!}
                       alt={flower.name}
                       className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                       onLoad={() => console.log('✅ Loaded:', flower.name)}
