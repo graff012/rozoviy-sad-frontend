@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { API_URL, BASE_URL } from "../config";
 
 interface Flower {
   id: string;
@@ -61,8 +62,8 @@ const FavoritesPage = () => {
       cleanPath = `images/${cleanPath}`;
     }
     
-    // Construct the full URL
-    const fullUrl = `http://localhost:4000/${cleanPath}`;
+    // Construct the full URL using shared BASE_URL
+    const fullUrl = `${BASE_URL}/${cleanPath}`;
     
     console.log('Generated image URL:', { 
       original: imgPath, 
@@ -92,7 +93,7 @@ const FavoritesPage = () => {
       console.log('Using token:', token.substring(0, 10) + '...');
       
       // Get all flowers with like status from the backend
-      const response = await fetch('http://localhost:4000/api/flowers', {
+      const response = await fetch(`${API_URL}/flowers`, {
         method: 'GET',
         credentials: 'include',
         headers: {

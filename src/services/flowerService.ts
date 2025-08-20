@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API_URL } from '../config';
 
 export interface LikeResponse {
   success: boolean;
@@ -10,7 +11,7 @@ export interface LikeResponse {
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: 'http://localhost:4000/api',
+  baseURL: API_URL,
   withCredentials: true,
 });
 
@@ -37,7 +38,7 @@ export const toggleLike = async (flowerId: string, userId: string): Promise<Like
     // For now, we'll use the test endpoint
     try {
       const testResponse = await axios.get<LikeResponse>(
-        `http://localhost:4000/api/flowers/test-like/${flowerId}/${userId}`,
+        `${API_URL}/flowers/test-like/${flowerId}/${userId}`,
         { withCredentials: true }
       );
       return testResponse.data;
