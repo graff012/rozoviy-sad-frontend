@@ -9,7 +9,7 @@ import {
   FaMinus,
   FaArrowLeft,
 } from "react-icons/fa";
-import { API_URL, CARD_NUMBER } from "../config";
+import { API_URL, CARD_NUMBER, BASE_URL } from "../config";
 
 interface FormData {
   firstName: string;
@@ -18,7 +18,7 @@ interface FormData {
   address: string;
 }
 
-const BASE_URL = API_URL.replace("api", "");
+// Using shared BASE_URL derived in config
 
 // Helper function to construct proper image URL
 const getImageUrl = (imgUrl: string | undefined): string => {

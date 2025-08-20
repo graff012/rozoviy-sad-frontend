@@ -5,7 +5,7 @@ import { BiCategory } from "react-icons/bi";
 import { MdBorderColor } from "react-icons/md";
 import { AdminCategory } from "./AdminCategory";
 import { AdminOrders } from "./AdminOrders";
-import { API_URL } from "../config";
+import { API_URL, BASE_URL } from "../config";
 
 type Category = {
   id: string;
@@ -23,8 +23,7 @@ type Flower = {
   price: string;
 };
 
-// Create base URL for static files (remove /api from API_URL)
-const BASE_URL = API_URL.replace('/api', '');
+// BASE_URL is derived in config
 console.log(BASE_URL)
 
 export const AdminPanel = () => {

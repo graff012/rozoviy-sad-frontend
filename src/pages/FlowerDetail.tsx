@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useCart } from "../contexts/CartContext";
 import { FaArrowLeft, FaShare } from "react-icons/fa6";
-import { API_URL } from "../config";
+import { API_URL, BASE_URL } from "../config";
 
 interface Flower {
   id: string;
@@ -27,7 +27,6 @@ const FlowerDetail = () => {
   const { addToCart, cartItems } = useCart();
 
 
-  const BASE_URL = API_URL.replace("api", "")
 
   // Helper function to construct proper image URL
   const getImageUrl = (imgUrl: string | undefined): string => {
