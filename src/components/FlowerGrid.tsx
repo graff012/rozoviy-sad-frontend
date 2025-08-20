@@ -4,6 +4,7 @@ import { toggleLike } from '../services/flowerService';
 import { useCart } from '../contexts/CartContext';
 import { API_URL } from '../config';
 
+
 interface Flower {
   id: string;
   name: string;
@@ -33,6 +34,7 @@ const FlowerGrid = ({ searchTerm }: FlowerGridProps) => {
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const { addToCart, cartItems } = useCart();
   const [loading, setLoading] = useState(true);
+
 
   const handleLikeClick = useCallback(
     async (flowerId: string) => {
