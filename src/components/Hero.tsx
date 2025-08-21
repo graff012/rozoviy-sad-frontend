@@ -4,15 +4,9 @@ import { useNavigate } from "react-router-dom";
 const Hero = () => {
   const navigate = useNavigate();
 
-  // Function to scroll to flowers section on the same page
-  const scrollToFlowers = () => {
-    const flowersSection = document.getElementById("flowers-section");
-    if (flowersSection) {
-      flowersSection.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
+  // Navigate to the flowers section on HomePage
+  const goToFlowers = () => {
+    navigate({ pathname: "/", hash: "#flowers-section" });
   };
 
   return (
@@ -33,14 +27,14 @@ const Hero = () => {
             {/* Mobile Buttons - Stack vertically */}
             <div className="space-y-4">
               <button
-                onClick={scrollToFlowers}
+                onClick={goToFlowers}
                 className="w-full px-6 bg-white py-3 rounded-lg text-lg hover:-translate-y-0.5 hover:cursor-pointer transition-transform duration-200 font-medium"
               >
                 Xarid qilish
               </button>
 
               <div
-                onClick={scrollToFlowers}
+                onClick={goToFlowers}
                 className="flex items-center justify-center gap-x-3 bg-white px-6 py-3 rounded-lg text-lg hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200 font-medium"
               >
                 <span>Gullarni ko'rish</span>
@@ -55,7 +49,7 @@ const Hero = () => {
               {/* Image One */}
               <div className="imgOne h-32 sm:h-40 rounded-lg relative overflow-hidden">
                 <button
-                  onClick={scrollToFlowers}
+                  onClick={goToFlowers}
                   className="absolute top-2 left-2 px-3 py-1 text-xs sm:text-sm text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 rounded transition-transform duration-200"
                 >
                   Yangi
@@ -65,7 +59,7 @@ const Hero = () => {
               {/* Image Two */}
               <div className="imgTwo h-32 sm:h-40 rounded-lg relative overflow-hidden">
                 <button
-                  onClick={scrollToFlowers}
+                  onClick={goToFlowers}
                   className="absolute top-2 left-2 px-3 py-1 text-xs sm:text-sm text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 rounded transition-transform duration-200"
                 >
                   Mashhur
@@ -76,7 +70,7 @@ const Hero = () => {
             {/* Featured Image - Full width on mobile */}
             <div className="imgThree h-64 sm:h-80 rounded-lg relative overflow-hidden flex flex-col justify-between p-4">
               <button
-                onClick={scrollToFlowers}
+                onClick={goToFlowers}
                 className="px-3 py-1 text-xs sm:text-sm text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 w-fit rounded transition-transform duration-200"
               >
                 Xususiyatlari
@@ -91,7 +85,7 @@ const Hero = () => {
                   va umidlarning go'zal aksidir.
                 </p>
                 <button
-                  onClick={scrollToFlowers}
+                  onClick={goToFlowers}
                   className="py-2 sm:py-3 bg-white text-black w-full hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200 rounded font-medium"
                 >
                   Ko'proq bilish
@@ -113,16 +107,16 @@ const Hero = () => {
                 umidlarning go'zal aksidir.
               </p>
               <div className="flex items-center justify-between w-[400px] mt-5">
-                {/* Shop now button with scroll to flowers */}
+                {/* Shop now button goes to flowers */}
                 <button
-                  onClick={scrollToFlowers}
+                  onClick={goToFlowers}
                   className="px-4 bg-white py-3 rounded-lg text-lg hover:-translate-y-0.5 hover:cursor-pointer transition-transform duration-200"
                 >
                   Xarid qilish
                 </button>
-                {/* Explore plants button with scroll to flowers */}
+                {/* Explore plants button goes to flowers */}
                 <div
-                  onClick={scrollToFlowers}
+                  onClick={goToFlowers}
                   className="flex items-center gap-x-3 bg-white px-4 py-3 rounded-lg text-lg hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200"
                 >
                   <button className="hover:cursor-pointer">
@@ -138,7 +132,7 @@ const Hero = () => {
             <div className="flex flex-col">
               <div className="imgOne w-[220px] h-[260px] m-1 relative overflow-hidden rounded-lg">
                 <button
-                  onClick={scrollToFlowers}
+                  onClick={goToFlowers}
                   className="absolute top-2 left-2 px-4 py-1 text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 rounded transition-transform duration-200"
                 >
                   Yangilar
@@ -146,7 +140,7 @@ const Hero = () => {
               </div>
               <div className="imgTwo w-[220px] h-[270px] m-1 relative overflow-hidden rounded-lg">
                 <button
-                  onClick={scrollToFlowers}
+                  onClick={goToFlowers}
                   className="absolute top-2 left-2 px-4 py-1 text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 rounded transition-transform duration-200"
                 >
                   Mashhurlar
@@ -155,7 +149,7 @@ const Hero = () => {
             </div>
             <div className="imgThree w-[380px] h-[540px] m-1 flex flex-col justify-between rounded-lg overflow-hidden p-4">
               <button
-                onClick={scrollToFlowers}
+                onClick={goToFlowers}
                 className="px-4 py-1 text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 w-fit rounded transition-transform duration-200"
               >
                 Xususiyatlari
@@ -167,7 +161,7 @@ const Hero = () => {
                   nazar, har doim yashnab o'sadigan o'simlik kabidir.
                 </p>
                 <button
-                  onClick={scrollToFlowers}
+                  onClick={goToFlowers}
                   className="py-3 bg-white text-center w-full hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200 rounded font-medium"
                 >
                   Ko'proq bilish
