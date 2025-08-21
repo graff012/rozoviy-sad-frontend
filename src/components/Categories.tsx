@@ -7,7 +7,6 @@ type Category = {
 }
 
 const Categories = () => {
-
   const [categories, setCategories] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -15,7 +14,6 @@ const Categories = () => {
     try {
       setLoading(true)
       const res = await fetch(`${API_URL}/categories`);
-
       if (res.ok) {
         const data: { categories: Category[] } = await res.json()
         setCategories(["Hammasi", ...data.categories.map((cat) => cat.name)])
@@ -34,21 +32,27 @@ const Categories = () => {
   }, [])
 
   return (
-    <section className="mt-10 mb-10 flex justify-center">
-      <div className="mycon flex gap-x-8">
+    <section className="mt-6 mb-6 md:mt-10 md:mb-10 px-4 flex justify-center">
+      <div className="mycon w-full max-w-4xl">
         {loading ? (
-          <span>Loading...</span>
+          <div className="flex justify-center">
+            <span className="text-gray-600">Loading...</span>
+          </div>
         ) : (
-          categories.map((cat, index) => (
-            <button
-              key={index}
-              className="bg-amber-100 text-black border border-gray-500 py-1 px-2 rounded-md 
-                         active:bg-blue-600 hover:cursor-pointer 
-                         hover:-translate-y-0.5 transition-all"
-            >
-              {cat}
-            </button>
-          ))
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 lg:gap-x-8">
+            {categories.map((cat, index) => (
+              <button
+                key={index}
+                className="bg-amber-100 text-black border border-gray-500 
+                           py-1.5 px-3 sm:py-2 sm:px-4 rounded-md text-sm sm:text-base
+                           active:bg-blue-600 hover:cursor-pointer 
+                           hover:-translate-y-0.5 transition-all duration-200
+                           whitespace-nowrap flex-shrink-0"
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         )}
       </div>
     </section>
