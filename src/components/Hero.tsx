@@ -1,7 +1,10 @@
 import { FaArrowRightLong } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
-  // Function to scroll to flowers section
+  const navigate = useNavigate();
+
+  // Function to scroll to flowers section on the same page
   const scrollToFlowers = () => {
     const flowersSection = document.getElementById("flowers-section");
     if (flowersSection) {
@@ -24,7 +27,7 @@ const Hero = () => {
             </h1>
             <p className="text-sm sm:text-base text-white leading-6 mb-8 max-w-md mx-auto">
               Biz yashaydigan va ishlaydigan olam — qalbimizdagi munosabat va
-              umidlarning go‘zal aksidir.
+              umidlarning go'zal aksidir.
             </p>
 
             {/* Mobile Buttons - Stack vertically */}
@@ -51,14 +54,20 @@ const Hero = () => {
             <div className="grid grid-cols-2 gap-3 mb-4">
               {/* Image One */}
               <div className="imgOne h-32 sm:h-40 rounded-lg relative overflow-hidden">
-                <button className="absolute top-2 left-2 px-3 py-1 text-xs sm:text-sm text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 rounded transition-transform duration-200">
+                <button
+                  onClick={scrollToFlowers}
+                  className="absolute top-2 left-2 px-3 py-1 text-xs sm:text-sm text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 rounded transition-transform duration-200"
+                >
                   Yangi
                 </button>
               </div>
 
               {/* Image Two */}
               <div className="imgTwo h-32 sm:h-40 rounded-lg relative overflow-hidden">
-                <button className="absolute top-2 left-2 px-3 py-1 text-xs sm:text-sm text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 rounded transition-transform duration-200">
+                <button
+                  onClick={scrollToFlowers}
+                  className="absolute top-2 left-2 px-3 py-1 text-xs sm:text-sm text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 rounded transition-transform duration-200"
+                >
                   Mashhur
                 </button>
               </div>
@@ -66,7 +75,10 @@ const Hero = () => {
 
             {/* Featured Image - Full width on mobile */}
             <div className="imgThree h-64 sm:h-80 rounded-lg relative overflow-hidden flex flex-col justify-between p-4">
-              <button className="px-3 py-1 text-xs sm:text-sm text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 w-fit rounded transition-transform duration-200">
+              <button
+                onClick={scrollToFlowers}
+                className="px-3 py-1 text-xs sm:text-sm text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 w-fit rounded transition-transform duration-200"
+              >
                 Xususiyatlari
               </button>
 
@@ -76,7 +88,7 @@ const Hero = () => {
                 </h2>
                 <p className="text-xs sm:text-sm text-white leading-5 max-w-xs mx-auto">
                   Biz yashaydigan va ishlaydigan olam — qalbimizdagi munosabat
-                  va umidlarning go‘zal aksidir.
+                  va umidlarning go'zal aksidir.
                 </p>
                 <button
                   onClick={scrollToFlowers}
@@ -98,7 +110,7 @@ const Hero = () => {
               </h1>
               <p className="hero-p max-w-[420px] text-base text-white mt-8 leading-8">
                 Biz yashaydigan va ishlaydigan olam — qalbimizdagi munosabat va
-                umidlarning go‘zal aksidir.
+                umidlarning go'zal aksidir.
               </p>
               <div className="flex items-center justify-between w-[400px] mt-5">
                 {/* Shop now button with scroll to flowers */}
@@ -125,25 +137,34 @@ const Hero = () => {
           <div className="images flex">
             <div className="flex flex-col">
               <div className="imgOne w-[220px] h-[260px] m-1 relative overflow-hidden rounded-lg">
-                <button className="absolute top-2 left-2 px-4 py-1 text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 rounded transition-transform duration-200">
+                <button
+                  onClick={scrollToFlowers}
+                  className="absolute top-2 left-2 px-4 py-1 text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 rounded transition-transform duration-200"
+                >
                   Yangilar
                 </button>
               </div>
               <div className="imgTwo w-[220px] h-[270px] m-1 relative overflow-hidden rounded-lg">
-                <button className="absolute top-2 left-2 px-4 py-1 text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 rounded transition-transform duration-200">
+                <button
+                  onClick={scrollToFlowers}
+                  className="absolute top-2 left-2 px-4 py-1 text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 rounded transition-transform duration-200"
+                >
                   Mashhurlar
                 </button>
               </div>
             </div>
             <div className="imgThree w-[380px] h-[540px] m-1 flex flex-col justify-between rounded-lg overflow-hidden p-4">
-              <button className="px-4 py-1 text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 w-fit rounded transition-transform duration-200">
+              <button
+                onClick={scrollToFlowers}
+                className="px-4 py-1 text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 w-fit rounded transition-transform duration-200"
+              >
                 Xususiyatlari
               </button>
               <div className="text-center space-y-4">
                 <h2 className="text-2xl text-white">Mavsumiy gullar</h2>
                 <p className="font-[Steppe] text-[14px] max-w-[320px] text-center text-white leading-6">
-                  Inson gullari — fasl va ob-havo qanday bo‘lishidan qat’i
-                  nazar, har doim yashnab o‘sadigan o‘simlik kabidir.
+                  Inson gullari — fasl va ob-havo qanday bo'lishidan qat'i
+                  nazar, har doim yashnab o'sadigan o'simlik kabidir.
                 </p>
                 <button
                   onClick={scrollToFlowers}

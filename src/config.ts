@@ -1,32 +1,8 @@
 // API Configuration
 // Provide safe defaults in case VITE_* envs are not set in production
 const ENV_API_URL = (import.meta.env.VITE_API_URL as string | undefined);
-
-// Ensure the API URL always contains the backend global prefix '/api'
-function withApiSuffix(value: string): string {
-  try {
-    // If absolute URL, use URL API to normalize
-    if (/^https?:\/\//i.test(value)) {
-      const u = new URL(value);
-      // If path doesn't end with /api, append it
-      if (!/\/api\/?$/i.test(u.pathname)) {
-        u.pathname = `${u.pathname.replace(/\/$/, '')}/api`;
-      }
-      // Remove trailing slash for consistency
-      return u.toString().replace(/\/$/, '');
-    }
-    // Relative or origin-like
-    return /\/api\/?$/i.test(value)
-      ? value.replace(/\/$/, '')
-      : `${value.replace(/\/$/, '')}/api`;
-  } catch {
-    // Fallback to original value if parsing fails
-    return value;
-  }
-}
-
 export const API_URL: string = (ENV_API_URL && ENV_API_URL.length > 0)
-  ? withApiSuffix(ENV_API_URL)
+  ? ENV_API_URL
   : `${window.location.origin}/api`;
 
 // Base site origin (without /api). Compute defensively to avoid calling .replace on undefined

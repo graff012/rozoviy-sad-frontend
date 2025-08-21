@@ -200,7 +200,7 @@ const FlowerGrid = ({ searchTerm }: FlowerGridProps) => {
   }
 
   return (
-    <section className="w-full py-8 px-4 bg-gradient-to-br from-pink-50 to-purple-50">
+    <section id='flowers-section' className="w-full py-8 px-4 bg-gradient-to-br from-pink-50 to-purple-50">
       <div className="max-w-7xl mx-auto">
         {filteredFlowers.length === 0 ? (
           <div className="text-center py-12">

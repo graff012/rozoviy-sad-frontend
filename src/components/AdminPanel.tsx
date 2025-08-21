@@ -227,7 +227,7 @@ export const AdminPanel = () => {
           error: errorText
         });
         setCategories([]);
-        alert(`Failed to load categories: ${res.status} ${res.statusText}`);
+        alert(`Kategoriyalarni yuklashda xatolik: ${res.status} ${res.statusText}`);
       }
     } catch (err) {
       if (err instanceof Error && err.message !== "Authentication failed") {
@@ -265,7 +265,7 @@ export const AdminPanel = () => {
           error: errorText
         });
         setFlowers([]);
-        alert(`Failed to load flowers: ${res.status} ${res.statusText}`);
+        alert(`Gullarni yuklashda xatolik: ${res.status} ${res.statusText}`);
       }
     } catch (err) {
       if (err instanceof Error && err.message !== "Authentication failed") {
@@ -306,14 +306,14 @@ export const AdminPanel = () => {
   const handleSave = async () => {
     // Validate required fields
     if (!formData.name.trim() || !formData.price || !formData.categoryId) {
-      alert("Please fill in all required fields (Name, Price, Category)");
+      alert("Iltimos, barcha majburiy maydonlarni to'ldiring (Nomi, Narxi, Kategoriya)");
       return;
     }
 
     // Validate price
     const priceValue = parseFloat(formData.price);
     if (isNaN(priceValue) || priceValue <= 0) {
-      alert("Please enter a valid price greater than 0");
+      alert("Iltimos, 0 dan katta bo'lgan to'g'ri narxni kiriting");
       return;
     }
 
@@ -367,7 +367,7 @@ export const AdminPanel = () => {
           if (fileInput) {
             fileInput.value = "";
           }
-          alert("Flower added successfully!");
+          alert("Gul muvaffaqiyatli qo'shildi!");
         } else {
           const errorText = await res.text();
           console.error("Failed to add flower:", res.status, errorText);
@@ -376,16 +376,16 @@ export const AdminPanel = () => {
           try {
             const errorJson = JSON.parse(errorText);
             console.error("Parsed error:", errorJson);
-            alert(`Failed to add flower: ${errorJson.message || errorText}`);
+            alert(`Gul qo'shishda xatolik: ${errorJson.message || errorText}`);
           } catch {
-            alert(`Failed to add flower: ${res.status}. ${errorText}`);
+            alert(`Gul qo'shishda xatolik: ${res.status}. ${errorText}`);
           }
         }
       }
     } catch (error) {
       if (error instanceof Error && error.message !== "Authentication failed") {
         console.error("Error saving flower:", error);
-        alert("An error occurred while saving the flower. Please try again.");
+        alert("Gulni saqlashda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.");
       }
     } finally {
       setLoading(false);
@@ -435,11 +435,11 @@ export const AdminPanel = () => {
       if (fileInput) {
         fileInput.value = "";
       }
-      alert("Flower updated successfully!");
+      alert("Gul muvaffaqiyatli yangilandi!");
     } else {
       const errorText = await res.text();
       console.error("Failed to update flower:", res.status, errorText);
-      alert(`Failed to update flower: ${res.status}. Please try again.`);
+      alert(`Gulni yangilashda xatolik: ${res.status}. Iltimos, qayta urinib ko'ring.`);
     }
   };
 
@@ -494,16 +494,16 @@ export const AdminPanel = () => {
 
       if (res.ok) {
         setFlowers(flowers.filter((f) => f.id !== flowerIdToDelete));
-        alert("Flower deleted successfully!");
+        alert("Gul muvaffaqiyatli o'chirildi!");
       } else {
         const errorText = await res.text();
         console.error("Failed to delete flower:", res.status, errorText);
-        alert(`Failed to delete flower: ${res.status}. Please try again.`);
+        alert(`Gulni o'chirishda xatolik: ${res.status}. Iltimos, qayta urinib ko'ring.`);
       }
     } catch (error) {
       if (error instanceof Error && error.message !== "Authentication failed") {
         console.error("Error deleting flower:", error);
-        alert("An error occurred while deleting the flower. Please try again.");
+        alert("Gulni o'chirishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.");
       }
     } finally {
       setShowConfirmDialog(false);
@@ -522,7 +522,7 @@ export const AdminPanel = () => {
       <div className="min-h-screen flex items-center justify-center bg-[#f8f6fa]">
         <div className="text-center">
           <div className="animate-pulse text-xl text-gray-600">
-            Checking authentication...
+            Autentifikatsiya tekshirilmoqda...
           </div>
         </div>
       </div>
@@ -545,14 +545,14 @@ export const AdminPanel = () => {
               onClick={handleLogout}
               className="text-sm text-red-600 hover:text-red-800 font-medium"
             >
-              Logout
+              Chiqish
             </button>
           </div>
           <nav className="flex flex-col gap-y-3 sm:gap-y-4">
             {[
-              { name: "Flowers", icon: IoFlowerOutline, tab: "flowers" },
-              { name: "Categories", icon: BiCategory, tab: "categories" },
-              { name: "Orders", icon: MdBorderColor, tab: "orders" },
+              { name: "Gullar", icon: IoFlowerOutline, tab: "flowers" },
+              { name: "Kategoriyalar", icon: BiCategory, tab: "categories" },
+              { name: "Buyurtmalar", icon: MdBorderColor, tab: "orders" },
             ].map((item) => (
               <button
                 key={item.tab}
@@ -571,31 +571,31 @@ export const AdminPanel = () => {
           {activeTab === "flowers" && (
             <>
               <h2 className="text-xl sm:text-2xl font-semibold mb-2 font-[Chillax] text-black">
-                Welcome back, Admin!
+                Xush kelibsiz, Admin!
               </h2>
 
               {loading && (
                 <div className="text-center py-4">
-                  <div className="text-gray-600">Loading...</div>
+                  <div className="text-gray-600">Yuklanmoqda...</div>
                 </div>
               )}
 
               {/* Add/Edit Form */}
               <div className="bg-white p-5 sm:p-6 rounded-lg shadow border border-[#f0e5ef]">
                 <h3 className="text-lg font-semibold mb-4 text-black">
-                  {editingId ? "Edit Flower" : "Add New Flower"}
+                  {editingId ? "Gulni tahrirlash" : "Yangi gul qo'shish"}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">
-                      Name *
+                      Nomi *
                     </label>
                     <input
                       type="text"
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      placeholder="e.g. Red Rose"
+                      placeholder="masalan: Qizil atirgul"
                       className="w-full border border-[#e7d6e0] rounded py-2 px-3 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#f2b5d4]"
                       required
                     />
@@ -603,7 +603,7 @@ export const AdminPanel = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">
-                      Smell *
+                      Hid *
                     </label>
                     <select
                       value={formData.smell}
@@ -612,38 +612,38 @@ export const AdminPanel = () => {
                       }
                       className="w-full border border-[#e7d6e0] rounded py-2 px-3 bg-white text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#f2b5d4]"
                     >
-                      <option value="">Select Smell Strength</option>
-                      <option value="WEAK">weak</option>
-                      <option value="AVERAGE">average</option>
-                      <option value="STRONG">strong</option>
-                      <option value="VERY_STRONG">very strong</option>
+                      <option value="">Hid kuchini tanlang</option>
+                      <option value="WEAK">zaif</option>
+                      <option value="AVERAGE">o'rtacha</option>
+                      <option value="STRONG">kuchli</option>
+                      <option value="VERY_STRONG">juda kuchli</option>
                     </select>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">
-                      Size
+                      O'lcham
                     </label>
                     <input
                       type="text"
                       name="flowerSize"
                       value={formData.flowerSize}
                       onChange={handleChange}
-                      placeholder="e.g. Medium"
+                      placeholder="masalan: O'rtacha"
                       className="w-full border border-[#e7d6e0] rounded py-2 px-3 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#f2b5d4]"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">
-                      Height
+                      Balandligi
                     </label>
                     <input
                       type="text"
                       name="height"
                       value={formData.height}
                       onChange={handleChange}
-                      placeholder="e.g. 60 cm"
+                      placeholder="masalan: 60 sm"
                       className="w-full border border-[#e7d6e0] rounded py-2 px-3 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#f2b5d4]"
                     />
                   </div>
@@ -662,7 +662,7 @@ export const AdminPanel = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">
-                      Category * ({categories.length} available)
+                      Kategoriya * ({categories.length} mavjud)
                     </label>
                     <select
                       name="categoryId"
@@ -671,7 +671,7 @@ export const AdminPanel = () => {
                       className="w-full border border-[#e7d6e0] rounded py-2 px-3 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#f2b5d4]"
                       required
                     >
-                      <option value="">Select a category</option>
+                      <option value="">Kategoriya tanlang</option>
                       {categories.map((cat) => (
                         <option key={cat.id} value={cat.id}>
                           {cat.name}
@@ -680,14 +680,14 @@ export const AdminPanel = () => {
                     </select>
                     {categories.length === 0 && (
                       <div className="text-sm text-red-500 mt-1">
-                        No categories available. Please add categories first.
+                        Kategoriyalar mavjud emas. Iltimos, avval kategoriyalar qo'shing.
                       </div>
                     )}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">
-                      Price *
+                      Narxi *
                     </label>
                     <input
                       type="number"
@@ -714,17 +714,17 @@ export const AdminPanel = () => {
                     className="bg-[#f2b5d4] hover:bg-[#e7a3c4] disabled:bg-gray-300 disabled:cursor-not-allowed text-black font-semibold py-2 px-6 rounded shadow transition text-center"
                   >
                     {loading
-                      ? "Saving..."
+                      ? "Saqlanmoqda..."
                       : editingId
-                        ? "Update Flower"
-                        : "+ Add Flower"}
+                        ? "Gulni yangilash"
+                        : "+ Gul qo'shish"}
                   </button>
                   {editingId && (
                     <button
                       onClick={handleCancelEdit}
                       className="bg-gray-200 hover:bg-gray-300 text-black font-semibold py-2 px-6 rounded shadow transition text-center"
                     >
-                      Cancel
+                      Bekor qilish
                     </button>
                   )}
                 </div>
@@ -734,16 +734,16 @@ export const AdminPanel = () => {
               <div className="bg-white rounded-lg shadow border border-[#f0e5ef] overflow-hidden">
                 {/* Header - Hidden on small screens, shown as labels inside rows */}
                 <div className="hidden sm:flex bg-[#fdf6f9] border-b border-[#f0e5ef] font-semibold text-black px-6 py-3">
-                  <div className="w-1/4">Flower</div>
-                  <div className="w-1/4">Size / Smell</div>
-                  <div className="w-1/4">Height</div>
-                  <div className="w-1/4">Actions</div>
+                  <div className="w-1/4">Gul</div>
+                  <div className="w-1/4">O'lcham / Hid</div>
+                  <div className="w-1/4">Balandlik</div>
+                  <div className="w-1/4">Amallar</div>
                 </div>
 
                 {/* Mobile-first scrollable wrapper for small screens */}
                 <div className="sm:hidden">
                   {flowers.length === 0 ? (
-                    <div className="px-4 py-4 text-center text-gray-500">No flowers added yet.</div>
+                    <div className="px-4 py-4 text-center text-gray-500">Hali gullar qo'shilmagan.</div>
                   ) : (
                     flowers.map((flower) => {
                       const imageUrl = flower.imgUrl ? getImageUrl(flower.imgUrl) : '';
@@ -774,26 +774,26 @@ export const AdminPanel = () => {
                             </div>
                           </div>
                           <div className="text-sm text-black mb-1">
-                            <strong>Size:</strong> {flower.flowerSize || "–"}
+                            <strong>O'lcham:</strong> {flower.flowerSize || "–"}
                           </div>
                           <div className="text-sm text-black mb-1">
-                            <strong>Smell:</strong> {flower.smell || "–"}
+                            <strong>Hid:</strong> {flower.smell || "–"}
                           </div>
                           <div className="text-sm text-black mb-2">
-                            <strong>Height:</strong> {flower.height || "–"}
+                            <strong>Balandlik:</strong> {flower.height || "–"}
                           </div>
                           <div className="flex gap-x-2">
                             <button
                               onClick={() => handleEditClick(flower)}
                               className="text-xs sm:text-sm bg-[#fdf6f9] hover:bg-[#ffe3f0] text-black px-3 py-1 rounded transition"
                             >
-                              Edit
+                              Tahrirlash
                             </button>
                             <button
                               onClick={() => handleDelete(flower.id)}
                               className="text-xs sm:text-sm bg-[#ffeef0] hover:bg-red-200 text-[#e57373] px-3 py-1 rounded transition"
                             >
-                              Delete
+                              O'chirish
                             </button>
                           </div>
                         </div>
@@ -806,7 +806,7 @@ export const AdminPanel = () => {
                 <div className="hidden sm:block divide-y divide-[#f0e5ef]">
                   {flowers.length === 0 ? (
                     <div className="px-6 py-4 text-center text-gray-500">
-                      No flowers added yet.
+                      Hali gullar qo'shilmagan.
                     </div>
                   ) : (
                     flowers.map((flower) => {
@@ -847,13 +847,13 @@ export const AdminPanel = () => {
                               onClick={() => handleEditClick(flower)}
                               className="text-sm bg-[#fdf6f9] hover:bg-[#ffe3f0] text-black px-3 py-1 rounded transition"
                             >
-                              Edit
+                              Tahrirlash
                             </button>
                             <button
                               onClick={() => handleDelete(flower.id)}
                               className="text-sm bg-[#ffeef0] hover:bg-red-200 text-[#e57373] px-3 py-1 rounded transition"
                             >
-                              Delete
+                              O'chirish
                             </button>
                           </div>
                         </div>
@@ -880,22 +880,22 @@ export const AdminPanel = () => {
                 role="dialog"
                 aria-modal="true"
               >
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Confirm Deletion</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">O'chirishni tasdiqlash</h3>
                 <p className="text-gray-600 mb-5 text-sm">
-                  Are you sure you want to delete this flower? This action cannot be undone.
+                  Haqiqatan ham bu gulni o'chirmoqchimisiz? Bu amalni qaytarib bo'lmaydi.
                 </p>
                 <div className="flex justify-end gap-x-2">
                   <button
                     onClick={cancelDelete}
                     className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-1.5 px-4 rounded transition text-sm"
                   >
-                    Cancel
+                    Bekor qilish
                   </button>
                   <button
                     onClick={confirmDelete}
                     className="bg-red-500 hover:bg-red-600 text-white font-medium py-1.5 px-4 rounded transition text-sm"
                   >
-                    Delete
+                    O'chirish
                   </button>
                 </div>
               </div>
