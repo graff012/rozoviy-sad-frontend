@@ -1,11 +1,23 @@
 import { FaArrowRightLong } from "react-icons/fa6";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Hero = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Navigate to the flowers section on HomePage
+  // Navigate to the flowers section on HomePage (and handle repeat clicks)
   const goToFlowers = () => {
+    const alreadyOnFlowers =
+      location.pathname === "/" && location.hash === "#flowers-section";
+
+    if (alreadyOnFlowers) {
+      const el = document.getElementById("flowers-section");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+    }
+
     navigate({ pathname: "/", hash: "#flowers-section" });
   };
 
