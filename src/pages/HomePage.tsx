@@ -28,6 +28,19 @@ const HomePage = () => {
     }
   }, [location.hash]);
 
+  // Auto-scroll to grid when category changes
+  useEffect(() => {
+    if (selectedCategoryId !== undefined) {
+      const el = document.getElementById("flowers-section");
+      if (el) {
+        // timeout ensures the grid has updated/rendered
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 0);
+      }
+    }
+  }, [selectedCategoryId]);
+
   return (
     <>
       <Hero />
