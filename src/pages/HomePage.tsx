@@ -2,7 +2,7 @@ import Hero from "../components/Hero"
 import Categories from "../components/Categories"
 import FlowerGrid from "../components/FlowerGrid"
 import { useOutletContext, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface OutletContext {
   searchTerm: string;
@@ -13,6 +13,7 @@ const HomePage = () => {
   const context = useOutletContext<OutletContext>()
   const searchTerm = context?.searchTerm || '';
   const location = useLocation();
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>(''); // empty means All
 
   // Scroll to flowers section if URL hash is present
   useEffect(() => {
@@ -30,8 +31,11 @@ const HomePage = () => {
   return (
     <>
       <Hero />
-      <Categories />
-      <FlowerGrid searchTerm={searchTerm} />
+      <Categories
+        selectedCategoryId={selectedCategoryId}
+        onSelectCategory={setSelectedCategoryId}
+      />
+      <FlowerGrid searchTerm={searchTerm} selectedCategoryId={selectedCategoryId} />
     </>
   )
 }

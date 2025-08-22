@@ -6,8 +6,13 @@ type Category = {
   name: string;
 }
 
-const Categories = () => {
-  const [categories, setCategories] = useState<string[]>([])
+interface CategoriesProps {
+  selectedCategoryId: string;
+  onSelectCategory: (id: string) => void;
+}
+
+const Categories = ({ selectedCategoryId, onSelectCategory }: CategoriesProps) => {
+  const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(false)
 
   const fetchCategories = async () => {
@@ -15,8 +20,9 @@ const Categories = () => {
       setLoading(true)
       const res = await fetch(`${API_URL}/categories`);
       if (res.ok) {
-        const data: { categories: Category[] } = await res.json()
-        setCategories(["Hammasi", ...data.categories.map((cat) => cat.name)])
+        const data = await res.json();
+        const categoriesData: Category[] = Array.isArray(data) ? data : (data?.categories || []);
+        setCategories(categoriesData)
       } else {
         console.error("Failed to fetch Categories", res.status)
       }
@@ -40,16 +46,20 @@ const Categories = () => {
           </div>
         ) : (
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 lg:gap-x-8">
-            {categories.map((cat, index) => (
+            <button
+              key="all"
+              className={`border border-gray-500 py-1.5 px-3 sm:py-2 sm:px-4 rounded-md text-sm sm:text-base whitespace-nowrap flex-shrink-0 transition-all duration-200 hover:-translate-y-0.5 hover:cursor-pointer ${selectedCategoryId === '' ? 'bg-blue-600 text-white' : 'bg-amber-100 text-black'}`}
+              onClick={() => onSelectCategory('')}
+            >
+              Все
+            </button>
+            {categories.map((cat) => (
               <button
-                key={index}
-                className="bg-amber-100 text-black border border-gray-500 
-                           py-1.5 px-3 sm:py-2 sm:px-4 rounded-md text-sm sm:text-base
-                           active:bg-blue-600 hover:cursor-pointer 
-                           hover:-translate-y-0.5 transition-all duration-200
-                           whitespace-nowrap flex-shrink-0"
+                key={cat.id}
+                className={`border border-gray-500 py-1.5 px-3 sm:py-2 sm:px-4 rounded-md text-sm sm:text-base whitespace-nowrap flex-shrink-0 transition-all duration-200 hover:-translate-y-0.5 hover:cursor-pointer ${selectedCategoryId === cat.id ? 'bg-blue-600 text-white' : 'bg-amber-100 text-black'}`}
+                onClick={() => onSelectCategory(cat.id)}
               >
-                {cat}
+                {cat.name}
               </button>
             ))}
           </div>

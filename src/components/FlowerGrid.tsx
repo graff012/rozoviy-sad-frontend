@@ -24,9 +24,10 @@ interface Category {
 
 interface FlowerGridProps {
   searchTerm: string;
+  selectedCategoryId?: string; // empty or undefined means All
 }
 
-const FlowerGrid = ({ searchTerm }: FlowerGridProps) => {
+const FlowerGrid = ({ searchTerm, selectedCategoryId }: FlowerGridProps) => {
   const [flowers, setFlowers] = useState<Flower[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [filteredFlowers, setFilteredFlowers] = useState<Flower[]>([]);
@@ -167,19 +168,24 @@ const FlowerGrid = ({ searchTerm }: FlowerGridProps) => {
   }, []);
 
   useEffect(() => {
-    setFilteredFlowers(
-      searchTerm
-        ? flowers.filter((f) => {
-          const catName = getCategoryName(f.categoryId);
-          return (
-            f.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            f.smell.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            catName.toLowerCase().includes(searchTerm.toLowerCase())
-          );
-        })
-        : flowers
-    );
-  }, [searchTerm, flowers, categories]);
+    const term = searchTerm?.toLowerCase() || '';
+    const catId = selectedCategoryId || '';
+
+    const result = flowers.filter((f) => {
+      // category filter first
+      if (catId && (f.categoryId || '').toString() !== catId) return false;
+
+      if (!term) return true;
+      const catName = getCategoryName(f.categoryId).toLowerCase();
+      return (
+        f.name.toLowerCase().includes(term) ||
+        f.smell.toLowerCase().includes(term) ||
+        catName.includes(term)
+      );
+    });
+
+    setFilteredFlowers(result);
+  }, [searchTerm, selectedCategoryId, flowers, categories]);
 
   const getCategoryName = (id: string): string => {
     return categories.find((c) => c.id === id)?.name || 'Uncategorized';
