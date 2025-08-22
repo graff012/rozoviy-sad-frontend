@@ -46,9 +46,10 @@ interface OrderType {
 interface OrderItemProps {
   order: OrderType;
   onStatusChange: (orderId: string, status: string) => void;
+  onDelete: (orderId: string) => void;
 }
 
-const OrderItem = ({ order, onStatusChange }: OrderItemProps) => {
+const OrderItem = ({ order, onStatusChange, onDelete }: OrderItemProps) => {
   return (
     <>
       {/* Mobile Card View */}
@@ -72,7 +73,7 @@ const OrderItem = ({ order, onStatusChange }: OrderItemProps) => {
         </div>
 
         <div className="mb-3">
-          <div className="text-sm font-medium text-gray-700">Mahsulotlar:</div>
+          <div className="text-sm font-medium text-gray-700">Товары:</div>
           {order.items.map((item, i) => (
             <div key={i} className="text-sm text-black">
               {item.quantity} x {item.name} — {item.total.toLocaleString()} UZS
@@ -94,11 +95,20 @@ const OrderItem = ({ order, onStatusChange }: OrderItemProps) => {
                     : 'bg-blue-100 text-blue-800'
               }`}
           >
-            <option value="pending">Kutilmoqda</option>
-            <option value="processing">Jarayonda</option>
-            <option value="completed">Yakunlangan</option>
-            <option value="cancelled">Bekor qilingan</option>
+            <option value="pending">В ожидании</option>
+            <option value="processing">В обработке</option>
+            <option value="completed">Завершён</option>
+            <option value="cancelled">Отменён</option>
           </select>
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            onClick={() => onDelete(order.id)}
+            className="text-xs bg-[#ffeef0] hover:bg-red-200 text-[#e57373] px-3 py-1 rounded transition"
+          >
+            Удалить
+          </button>
         </div>
       </div>
 
@@ -140,8 +150,16 @@ const OrderItem = ({ order, onStatusChange }: OrderItemProps) => {
             <option value="cancelled">Bekor qilingan</option>
           </select>
         </div>
-        <div className="w-1/6 text-xs text-gray-500 whitespace-nowrap">
-          {new Date(order.date).toLocaleString()}
+        <div className="w-1/6 flex items-center justify-between gap-2">
+          <div className="text-xs text-gray-500 whitespace-nowrap">
+            {new Date(order.date).toLocaleString()}
+          </div>
+          <button
+            onClick={() => onDelete(order.id)}
+            className="text-xs bg-[#ffeef0] hover:bg-red-200 text-[#e57373] px-3 py-1 rounded transition"
+          >
+            O'chirish
+          </button>
         </div>
       </div>
     </>
@@ -186,9 +204,9 @@ export const AdminOrders: React.FC = () => {
         return {
           id: order.id,
           customer: {
-            name: order.name || "Noma'lum",
-            phone: order.phone_number || "Noma'lum",
-            address: order.address || "Manzil kiritilmagan",
+            name: order.name || "Неизвестно",
+            phone: order.phone_number || "Неизвестно",
+            address: order.address || "Адрес не указан",
             telegram_username: order.telegram_username || "",
           },
           items,
@@ -201,7 +219,7 @@ export const AdminOrders: React.FC = () => {
       setOrders(mappedOrders);
     } catch (err) {
       console.error("Failed to fetch orders:", err);
-      setError("Buyurtmalarni yuklashda xatolik yuz berdi.");
+      setError("Ошибка при загрузке заказов.");
     } finally {
       setLoading(false);
     }
@@ -226,22 +244,46 @@ export const AdminOrders: React.FC = () => {
             order.id === orderId ? { ...order, status: newStatus as any } : order
           )
         );
-        alert("Holat muvaffaqiyatli yangilandi!");
+        alert("Статус успешно обновлён!");
       } else {
         const errorData = await response.json().catch(() => ({}));
         console.error("Status update failed:", errorData);
-        alert("Holatni yangilashda xatolik yuz berdi.");
+        alert("Ошибка при обновлении статуса.");
       }
     } catch (err) {
       console.error("Network error:", err);
-      alert("Tarmoqda xatolik. Internetni tekshiring.");
+      alert("Сетевая ошибка. Проверьте интернет.");
+    }
+  };
+
+  const handleDelete = async (orderId: string) => {
+    const confirmed = window.confirm("Подтвердить удаление заказа?");
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`${API_URL}/orders/${orderId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        setOrders((prev) => prev.filter((o) => o.id !== orderId));
+        alert("Заказ успешно удалён!");
+      } else {
+        const errorText = await response.text().catch(() => "");
+        console.error("Order delete failed:", response.status, errorText);
+        alert("Ошибка при удалении заказа.");
+      }
+    } catch (err) {
+      console.error("Network error:", err);
+      alert("Сетевая ошибка. Проверьте интернет.");
     }
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-10">
-        <div className="text-gray-600">Yuklanmoqda...</div>
+        <div className="text-gray-600">Загрузка...</div>
       </div>
     );
   }
@@ -254,7 +296,7 @@ export const AdminOrders: React.FC = () => {
           onClick={fetchOrders}
           className="ml-4 text-sm bg-pink-500 text-white px-3 py-1 rounded"
         >
-          Qayta urinish
+          Повторить
         </button>
       </div>
     );
@@ -264,24 +306,24 @@ export const AdminOrders: React.FC = () => {
     <div className="flex items-center justify-center py-8 px-4 sm:py-10">
       <div className="bg-[#fff4f7] rounded-xl shadow-lg w-full max-w-[900px] p-5 sm:p-8">
         <h2 className="text-xl sm:text-2xl font-bold mb-6 text-black text-center sm:text-left">
-          Buyurtmalarni boshqarish
+          Управление заказами
         </h2>
 
         <div className="bg-white rounded-lg shadow border border-[#f0e5ef] overflow-hidden">
           {/* Header */}
           <div className="hidden sm:flex bg-[#fdf6f9] border-b border-[#f0e5ef] text-black font-semibold px-6 py-3 text-sm">
-            <div className="w-1/6">Buyurtma</div>
-            <div className="w-1/4">Mijoz</div>
-            <div className="w-1/5">Mahsulotlar</div>
-            <div className="w-1/5">Jami</div>
-            <div className="w-1/5">Holati</div>
-            <div className="w-1/6">Sana</div>
+            <div className="w-1/6">Заказ</div>
+            <div className="w-1/4">Клиент</div>
+            <div className="w-1/5">Товары</div>
+            <div className="w-1/5">Итого</div>
+            <div className="w-1/5">Статус</div>
+            <div className="w-1/6 flex justify-between"><span>Дата</span><span className="pr-6">Действие</span></div>
           </div>
 
           <div className="divide-y divide-[#f0e5ef]">
             {orders.length === 0 ? (
               <div className="px-4 py-6 text-center text-gray-500 text-sm">
-                Hozircha buyurtmalar mavjud emas.
+                Заказов пока нет.
               </div>
             ) : (
               orders.map((order) => (
@@ -289,6 +331,7 @@ export const AdminOrders: React.FC = () => {
                   key={order.id}
                   order={order}
                   onStatusChange={handleStatusChange}
+                  onDelete={handleDelete}
                 />
               ))
             )}

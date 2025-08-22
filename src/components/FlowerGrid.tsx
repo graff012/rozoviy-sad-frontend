@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { toggleLike } from '../services/flowerService';
 import { useCart } from '../contexts/CartContext';
 import { API_URL } from '../config';
 
@@ -37,73 +36,7 @@ const FlowerGrid = ({ searchTerm, selectedCategoryId }: FlowerGridProps) => {
   const [loading, setLoading] = useState(true);
 
 
-  const handleLikeClick = useCallback(
-    async (flowerId: string) => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Please log in to like flowers');
-        return;
-      }
-
-      let userId: string | null = null;
-      try {
-        let parsedToken = token;
-        try {
-          parsedToken = JSON.parse(token);
-        } catch (e) {
-          // not JSON
-        }
-
-        const tokenToUse = typeof parsedToken === 'object' && parsedToken !== null && 'token' in parsedToken
-          ? (parsedToken as any).token
-          : parsedToken;
-
-        const tokenParts = String(tokenToUse).split('.');
-        if (tokenParts.length !== 3) throw new Error('Invalid token format');
-        const payload = JSON.parse(atob(tokenParts[1]));
-        userId = payload.sub || payload.userId || (payload.user?.id);
-        if (!userId) throw new Error('User ID not found');
-      } catch (err) {
-        const userData = localStorage.getItem('user');
-        console.error(err)
-        if (userData) {
-          try {
-            const user = JSON.parse(userData);
-            userId = user.id || user._id;
-          } catch (err) {
-            console.error(err)
-          }
-        }
-        if (!userId) {
-          alert('Please log in again.');
-          return;
-        }
-      }
-
-      setFlowers((prev) =>
-        prev.map((f) =>
-          f.id === flowerId ? { ...f, isLiked: !f.isLiked } : f
-        )
-      );
-
-      try {
-        const response = await toggleLike(flowerId, userId);
-        setFlowers((prev) =>
-          prev.map((f) =>
-            f.id === flowerId ? { ...f, isLiked: response.isLiked } : f
-          )
-        );
-      } catch (error) {
-        setFlowers((prev) =>
-          prev.map((f) =>
-            f.id === flowerId ? { ...f, isLiked: !f.isLiked } : f
-          )
-        );
-        alert('Failed to update like status');
-      }
-    },
-    [toggleLike]
-  );
+  // Like icon removed
 
   const fetchFlowers = async () => {
     setLoading(true);
@@ -133,7 +66,6 @@ const FlowerGrid = ({ searchTerm, selectedCategoryId }: FlowerGridProps) => {
         imgUrl: flower.imgUrl || flower.img_url || null,
         flowerSize: flower.flowerSize || flower.flower_size || '',
         categoryId: flower.categoryId || flower.category_id || '',
-        isLiked: Boolean(flower.isLiked),
       }));
 
       setFlowers(formattedFlowers);
@@ -244,33 +176,7 @@ const FlowerGrid = ({ searchTerm, selectedCategoryId }: FlowerGridProps) => {
                     </div>
                   )}
 
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleLikeClick(flower.id);
-                    }}
-                    aria-label={flower.isLiked ? "Remove from favorites" : "Add to favorites"}
-                    className={`absolute top-3 right-3 p-2 rounded-full shadow-md hover:scale-110 transition-all duration-200 ${flower.isLiked
-                      ? 'bg-red-500 hover:bg-red-600'
-                      : 'bg-white/90 backdrop-blur-sm hover:bg-white'
-                      }`}
-                  >
-                    <svg
-                      className={`w-5 h-5 transition-colors duration-200 ${flower.isLiked ? 'text-white' : 'text-gray-400'
-                        }`}
-                      fill={flower.isLiked ? 'currentColor' : 'none'}
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 000-6.364 4.5 4.5 0 00-6.364 0L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                      />
-                    </svg>
-                  </button>
+                  {/* Like icon removed */}
 
                   <div className="absolute top-3 left-3">
                     <span className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-gray-700">
