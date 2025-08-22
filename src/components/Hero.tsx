@@ -29,7 +29,7 @@ const Hero = () => {
           {/* Mobile Hero Text */}
           <div className="text-center px-4">
             <h1 className="text-3xl sm:text-4xl text-white font-semibold leading-tight mb-6">
-              Happiness blooms from within
+              Vodiy Turfa Gullari MCHJ
             </h1>
             <p className="text-sm sm:text-base text-white leading-6 mb-8 max-w-md mx-auto">
               Biz yashaydigan va ishlaydigan olam — qalbimizdagi munosabat va
@@ -112,7 +112,7 @@ const Hero = () => {
           <div className="flex flex-col items-center">
             <div className="w-[580px]">
               <h1 className="hero-title w-[540px] text-[64px] text-left text-white font-semibold">
-                Happiness blooms from within
+                Vodiy Turfa Gullari MCHJ
               </h1>
               <p className="hero-p max-w-[420px] text-base text-white mt-8 leading-8">
                 Biz yashaydigan va ishlaydigan olam — qalbimizdagi munosabat va
