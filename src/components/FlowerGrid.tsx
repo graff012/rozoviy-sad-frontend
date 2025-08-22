@@ -276,9 +276,9 @@ const FlowerGrid = ({ searchTerm }: FlowerGridProps) => {
                 <div className="p-5">
                   <h2 className="text-xl font-bold text-gray-800 mb-3">{flower.name}</h2>
                   <div className="space-y-2 mb-4 text-sm">
-                    <div><span className="font-medium">Hid:</span> {flower.smell}</div>
-                    <div><span className="font-medium">O'lcham:</span> {flower.flowerSize}</div>
-                    <div><span className="font-medium">Balandlik:</span> {flower.height}</div>
+                    <div><span className="font-medium">Аромат:</span> {flower.smell}</div>
+                    <div><span className="font-medium">Размер цветка:</span> {flower.flowerSize}</div>
+                    <div><span className="font-medium">Высота:</span> {flower.height}</div>
                   </div>
                   <div className="mb-4">
                     <p className="text-2xl font-bold text-pink-600">{flower.price} so'm</p>

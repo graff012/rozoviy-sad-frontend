@@ -208,7 +208,7 @@ const FlowerDetail = () => {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
-                      {flower.flowerSize} • {flower.height}
+                      Размер цветка: {flower.flowerSize} • Высота: {flower.height}
                     </div>
                     <h1 className="block mt-1 text-3xl font-medium text-gray-900">
                       {flower.name}
@@ -227,7 +227,7 @@ const FlowerDetail = () => {
                 </div>
 
                 <p className="mt-4 text-gray-600">
-                  <span className="font-semibold">Hidi:</span> {flower.smell}
+                  <span className="font-semibold">Аромат:</span> {flower.smell}
                 </p>
                 <p className="mt-2 text-2xl font-bold text-gray-900">
                   {flower.price} so'm
@@ -279,7 +279,7 @@ const FlowerDetail = () => {
             {/* Mobile Content */}
             <div className="p-6">
               <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold mb-2">
-                {flower.flowerSize} • {flower.height}
+                Размер цветка: {flower.flowerSize} • Высота: {flower.height}
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
                 {flower.name}
@@ -287,7 +287,7 @@ const FlowerDetail = () => {
 
               <div className="bg-gray-50 rounded-lg p-4 mb-6">
                 <p className="text-gray-700">
-                  <span className="font-semibold">Hidi:</span> {flower.smell}
+                  <span className="font-semibold">Аромат:</span> {flower.smell}
                 </p>
               </div>
 

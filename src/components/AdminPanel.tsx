@@ -603,7 +603,7 @@ export const AdminPanel = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">
-                      Hid *
+                      Аромат *
                     </label>
                     <select
                       value={formData.smell}
@@ -612,17 +612,17 @@ export const AdminPanel = () => {
                       }
                       className="w-full border border-[#e7d6e0] rounded py-2 px-3 bg-white text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#f2b5d4]"
                     >
-                      <option value="">Hid kuchini tanlang</option>
-                      <option value="WEAK">zaif</option>
-                      <option value="AVERAGE">o'rtacha</option>
-                      <option value="STRONG">kuchli</option>
-                      <option value="VERY_STRONG">juda kuchli</option>
+                      <option value="">Выберите силу аромата</option>
+                      <option value="WEAK">слабый</option>
+                      <option value="AVERAGE">средний</option>
+                      <option value="STRONG">сильный</option>
+                      <option value="VERY_STRONG">очень сильный</option>
                     </select>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">
-                      O'lcham
+                      Размер цветка
                     </label>
                     <input
                       type="text"
@@ -636,7 +636,7 @@ export const AdminPanel = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">
-                      Balandligi
+                      Высота
                     </label>
                     <input
                       type="text"
@@ -662,7 +662,7 @@ export const AdminPanel = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">
-                      Kategoriya * ({categories.length} mavjud)
+                      Категория * ({categories.length} доступно)
                     </label>
                     <select
                       name="categoryId"
@@ -671,7 +671,7 @@ export const AdminPanel = () => {
                       className="w-full border border-[#e7d6e0] rounded py-2 px-3 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#f2b5d4]"
                       required
                     >
-                      <option value="">Kategoriya tanlang</option>
+                      <option value="">Выберите категорию</option>
                       {categories.map((cat) => (
                         <option key={cat.id} value={cat.id}>
                           {cat.name}
@@ -735,8 +735,8 @@ export const AdminPanel = () => {
                 {/* Header - Hidden on small screens, shown as labels inside rows */}
                 <div className="hidden sm:flex bg-[#fdf6f9] border-b border-[#f0e5ef] font-semibold text-black px-6 py-3">
                   <div className="w-1/4">Gul</div>
-                  <div className="w-1/4">O'lcham / Hid</div>
-                  <div className="w-1/4">Balandlik</div>
+                  <div className="w-1/4">Размер / Аромат</div>
+                  <div className="w-1/4">Высота</div>
                   <div className="w-1/4">Amallar</div>
                 </div>
 
@@ -774,13 +774,13 @@ export const AdminPanel = () => {
                             </div>
                           </div>
                           <div className="text-sm text-black mb-1">
-                            <strong>O'lcham:</strong> {flower.flowerSize || "–"}
+                            <strong>Размер цветка:</strong> {flower.flowerSize || "–"}
                           </div>
                           <div className="text-sm text-black mb-1">
-                            <strong>Hid:</strong> {flower.smell || "–"}
+                            <strong>Аромат:</strong> {flower.smell || "–"}
                           </div>
                           <div className="text-sm text-black mb-2">
-                            <strong>Balandlik:</strong> {flower.height || "–"}
+                            <strong>Высота:</strong> {flower.height || "–"}
                           </div>
                           <div className="flex gap-x-2">
                             <button
