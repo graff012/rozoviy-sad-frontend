@@ -114,8 +114,8 @@ const OrderItem = ({ order, onStatusChange, onDelete }: OrderItemProps) => {
 
       {/* Desktop Table Row */}
       <div className="hidden sm:flex items-center px-6 py-4 hover:bg-[#fff7fa] transition text-sm">
-        <div className="w-1/6 font-medium text-black">{`#${order.id}`}</div>
-        <div className="w-1/4 text-black">
+        <div className="basis-[15%] font-medium text-black">{`#${order.id}`}</div>
+        <div className="basis-[22%] text-black">
           <div className="font-medium truncate">{order.customer.name}</div>
           <div className="text-xs text-gray-500 truncate">{order.customer.phone}</div>
           <div className="text-xs text-gray-500 truncate">{order.customer.address}</div>
@@ -123,19 +123,19 @@ const OrderItem = ({ order, onStatusChange, onDelete }: OrderItemProps) => {
             <div className="text-xs text-gray-500">@{order.customer.telegram_username}</div>
           )}
         </div>
-        <div className="w-1/5 text-black">
+        <div className="basis-[23%] text-black">
           {order.items.map((item, i) => (
             <div key={i} className="text-xs truncate">
               {item.quantity}x {item.name}  {/* ✅ Fixed: use item.name */}
             </div>
           ))}
         </div>
-        <div className="w-1/5 font-medium text-black">{order.total.toLocaleString()} UZS</div>
-        <div className="w-1/5">
+        <div className="basis-[12%] font-medium text-black">{order.total.toLocaleString()} UZS</div>
+        <div className="basis-[13%]">
           <select
             value={order.status}
             onChange={(e) => onStatusChange(order.id, e.target.value)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium min-w-[100px] ${order.status === 'completed'
+            className={`px-3 py-1.5 rounded-full text-xs font-medium min-w-[120px] ${order.status === 'completed'
                 ? 'bg-green-100 text-green-800'
                 : order.status === 'processing'
                   ? 'bg-yellow-100 text-yellow-800'
@@ -144,21 +144,21 @@ const OrderItem = ({ order, onStatusChange, onDelete }: OrderItemProps) => {
                     : 'bg-blue-100 text-blue-800'
               }`}
           >
-            <option value="pending">Kutilmoqda</option>
-            <option value="processing">Jarayonda</option>
-            <option value="completed">Yakunlangan</option>
-            <option value="cancelled">Bekor qilingan</option>
+            <option value="pending">В ожидании</option>
+            <option value="processing">В обработке</option>
+            <option value="completed">Завершён</option>
+            <option value="cancelled">Отменён</option>
           </select>
         </div>
-        <div className="w-1/6 flex items-center justify-between gap-2">
+        <div className="basis-[15%] flex items-center justify-between gap-2">
           <div className="text-xs text-gray-500 whitespace-nowrap">
             {new Date(order.date).toLocaleString()}
           </div>
           <button
             onClick={() => onDelete(order.id)}
-            className="text-xs bg-[#ffeef0] hover:bg-red-200 text-[#e57373] px-3 py-1 rounded transition"
+            className="text-xs bg-[#ffeef0] hover:bg-red-200 text-[#e57373] px-3 py-1 rounded transition min-w-[86px] text-center"
           >
-            O'chirish
+            Удалить
           </button>
         </div>
       </div>
@@ -304,7 +304,7 @@ export const AdminOrders: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center py-8 px-4 sm:py-10">
-      <div className="bg-[#fff4f7] rounded-xl shadow-lg w-full max-w-[900px] p-5 sm:p-8">
+      <div className="bg-[#fff4f7] rounded-xl shadow-lg w-full max-w-5xl p-5 sm:p-8">
         <h2 className="text-xl sm:text-2xl font-bold mb-6 text-black text-center sm:text-left">
           Управление заказами
         </h2>
@@ -312,12 +312,12 @@ export const AdminOrders: React.FC = () => {
         <div className="bg-white rounded-lg shadow border border-[#f0e5ef] overflow-hidden">
           {/* Header */}
           <div className="hidden sm:flex bg-[#fdf6f9] border-b border-[#f0e5ef] text-black font-semibold px-6 py-3 text-sm">
-            <div className="w-1/6">Заказ</div>
-            <div className="w-1/4">Клиент</div>
-            <div className="w-1/5">Товары</div>
-            <div className="w-1/5">Итого</div>
-            <div className="w-1/5">Статус</div>
-            <div className="w-1/6 flex justify-between"><span>Дата</span><span className="pr-6">Действие</span></div>
+            <div className="basis-[15%]">Заказ</div>
+            <div className="basis-[22%]">Клиент</div>
+            <div className="basis-[23%]">Товары</div>
+            <div className="basis-[12%]">Итого</div>
+            <div className="basis-[13%]">Статус</div>
+            <div className="basis-[15%] flex justify-between"><span>Дата</span><span className="pr-2">Действие</span></div>
           </div>
 
           <div className="divide-y divide-[#f0e5ef]">
