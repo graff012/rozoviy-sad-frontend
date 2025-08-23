@@ -156,7 +156,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
           <div className="hidden md:flex justify-between items-center">
             <Link to={"/"}>
               <h1 className="title text-4xl font-semibold text-white">
-                <img src={mainLogo} alt="Logo" />
+                <img src='/rozoviysad-logo-colored.svg' alt="Logo" />
               </h1>
             </Link>
 
