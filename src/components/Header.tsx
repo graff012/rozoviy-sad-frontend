@@ -39,12 +39,12 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
   const { itemCount } = useCart();
 
   // Enhanced SVG logo component - made larger and more prominent
-  const MainLogo = () => (
+  const MainLogo = ({ isMobile = false }) => (
     <div className="flex items-center justify-center">
       <svg
         viewBox="0 0 600 400"
-        width="320"
-        height="200"
+        width={isMobile ? "280" : "400"}
+        height={isMobile ? "180" : "260"}
         xmlns="http://www.w3.org/2000/svg"
         className="mx-auto drop-shadow-lg"
       >
@@ -192,7 +192,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
           {/* Desktop layout */}
           <div className="hidden md:flex justify-between items-center">
             <Link to={"/"} className="flex-shrink-0">
-              <MainLogo />
+              <MainLogo isMobile={false} />
             </Link>
 
             <div className="flex gap-x-4 items-center">
@@ -273,18 +273,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
           <div className="md:hidden">
             <div className="flex justify-between items-center">
               <Link to={"/"} className="flex-shrink-0">
-                <div className="flex items-center justify-center">
-                  <svg
-                    viewBox="0 0 600 400"
-                    width="200"
-                    height="130"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="mx-auto drop-shadow-lg"
-                  >
-                    <path d="M 79,316 L 79,323 L 80,324 L 80,328 L 81,329 L 81,330 L 82,331 L 82,332 L 83,333 L 83,334 L 84,335 L 84,336 L 88,340 L 89,340 L 92,343 L 93,343 L 94,344 L 95,344 L 96,345 L 98,345 L 99,346 L 101,346 L 102,347 L 110,347 L 111,348 L 113,348 L 114,347 L 118,347 L 119,346 L 120,346 L 121,345 L 122,345 L 126,341 L 126,340 L 127,339 L 126,339 L 125,340 L 124,340 L 123,341 L 121,341 L 120,342 L 106,342 L 105,341 L 104,341 L 103,340 L 102,340 L 101,339 L 100,339 L 99,338 L 98,338 L 97,337 L 96,337 L 92,333 L 91,333 L 86,328 L 86,327 L 85,327 L 83,325 L 83,324 L 82,323 L 82,321 L 81,320 L 81,319 L 80,318 L 80,317 Z" fill="#FF4444" stroke="none" />
-                    {/* Include the rest of the SVG paths here for mobile */}
-                  </svg>
-                </div>
+                <MainLogo isMobile={true} />
               </Link>
 
               <div className="flex items-center gap-2">
