@@ -10,6 +10,7 @@ import { FaTimes } from "react-icons/fa";
 import { useState, useEffect, useRef } from "react";
 import { useCart } from "../contexts/CartContext";
 import { API_URL } from "../config";
+import mainLogo from "./../assets/images/rozoviysad-logo-colored.svg"
 
 interface HeaderProps {
   searchTerm: string;
@@ -155,7 +156,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
           <div className="hidden md:flex justify-between items-center">
             <Link to={"/"}>
               <h1 className="title text-4xl font-semibold text-white">
-                Rozoviy Sad
+                <img src={mainLogo} alt="Logo" />
               </h1>
             </Link>
 
