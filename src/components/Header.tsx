@@ -44,7 +44,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
       <svg
         viewBox="0 0 600 400"
         width={isMobile ? "280" : "400"}
-        height={isMobile ? "180" : "260"}
+        height={isMobile ? "180" : "160"}
         xmlns="http://www.w3.org/2000/svg"
         className="mx-auto drop-shadow-lg"
       >
