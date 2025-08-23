@@ -10,7 +10,6 @@ import { FaTimes } from "react-icons/fa";
 import { useState, useEffect, useRef } from "react";
 import { useCart } from "../contexts/CartContext";
 import { API_URL } from "../config";
-import mainLogo from "./../assets/images/rozoviysad-logo-colored.svg"
 
 interface HeaderProps {
   searchTerm: string;
