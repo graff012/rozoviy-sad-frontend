@@ -237,7 +237,9 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
           <div className="md:hidden">
             <div className="flex justify-between items-center">
               <Link to={"/"} className="flex-shrink-0">
-                <MainLogo isMobile={true} />
+                <h1 className="title text-2xl font-semibold text-white">
+                  Rozoviy Sad
+                </h1>
               </Link>
 
               <div className="flex items-center gap-2">
