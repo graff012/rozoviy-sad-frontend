@@ -224,11 +224,11 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
               </Link>
 
               <a
-                href="tel:+998990974203"
+                href="tel:+998904979797"
                 className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/30 rounded-lg text-white font-medium transition-colors group"
               >
                 <FaPhone className="group-hover:scale-110 transition-transform" />
-                <span className="hidden lg:inline">+998 99 097 42 03</span>
+                <span className="hidden lg:inline">+998 90 497 97 97</span>
                 <span className="lg:hidden">Call</span>
               </a>
             </div>
@@ -347,12 +347,12 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
               </Link>
 
               <a
-                href="tel:+998990974203"
+                href="tel:+998904979797"
                 className="flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-lg transition-colors"
                 onClick={() => setShowMobileMenu(false)}
               >
                 <FaPhone className="text-lg" />
-                <span>+998 99 097 42 03</span>
+                <span>+998 90 497 97 97</span>
               </a>
             </div>
           </div>
