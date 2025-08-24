@@ -153,11 +153,11 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
         <div className="mycon">
           {/* Desktop layout */}
           <div className="hidden md:flex justify-between items-center">
-            <Link to={"/"} className="flex-shrink-0">
+            <Link to={"/"}>
               {/* <h1 className="title text-4xl font-semibold text-white"> */}
               {/*   Rozoviy Sad */}
               {/* </h1> */}
-              <img className="h-[200px] w-[400px]" src="./incspace-two.svg" alt="logo" />
+              <img src="./incspace-five.svg" alt="logo" />
             </Link>
 
             <div className="flex gap-x-4 items-center">
@@ -238,9 +238,10 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
           <div className="md:hidden">
             <div className="flex justify-between items-center">
               <Link to={"/"} className="flex-shrink-0">
-                <h1 className="title text-2xl font-semibold text-white">
-                  Rozoviy Sad
-                </h1>
+                {/* <h1 className="title text-2xl font-semibold text-white"> */}
+                {/*   Rozoviy Sad */}
+                {/* </h1> */}
+                <img src="./incspace-seven.svg" alt="logo" />
               </Link>
 
               <div className="flex items-center gap-2">
@@ -286,74 +287,78 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
       </div>
 
       {/* Mobile Search Bar */}
-      {showMobileSearch && (
-        <div className="md:hidden bg-[#004F44] border-t border-white/20 px-4 pb-4">
-          <div className="flex flex-col relative">
-            <div className="flex gap-2 items-center border border-white rounded-lg px-3 py-2 bg-[#004F44]">
-              <IoSearchSharp className="text-xl text-white flex-shrink-0" />
-              <input
-                type="search"
-                placeholder="Qidirish..."
-                className="text-lg border-none flex-1 appearance-none focus:outline-none text-white bg-transparent py-1"
-                value={inputValue}
-                onChange={handleInputChange}
-                onFocus={handleSearchFocus}
-                onKeyDown={handleKeyDown}
-                autoComplete="off"
-              />
-              <button
-                className="px-3 py-1 bg-white text-[#004F44] rounded hover:bg-gray-200 transition-colors font-medium text-sm flex-shrink-0"
-                onClick={handleSearch}
-                aria-label="Qidirish"
-              >
-                Qidirish
-              </button>
-            </div>
-            {showSuggestions && (
-              <div
-                ref={suggestionsRef}
-                className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-b-lg shadow-lg z-50 max-h-48 overflow-y-auto"
-              >
-                {filteredSuggestions.map((flower) => (
-                  <div
-                    key={flower.id}
-                    className="px-4 py-3 cursor-pointer hover:bg-gray-100 text-black border-b border-gray-100 last:border-b-0"
-                    onClick={() => handleSuggestionClick(flower)}
-                  >
-                    {flower.name}
-                  </div>
-                ))}
+      {
+        showMobileSearch && (
+          <div className="md:hidden bg-[#004F44] border-t border-white/20 px-4 pb-4">
+            <div className="flex flex-col relative">
+              <div className="flex gap-2 items-center border border-white rounded-lg px-3 py-2 bg-[#004F44]">
+                <IoSearchSharp className="text-xl text-white flex-shrink-0" />
+                <input
+                  type="search"
+                  placeholder="Qidirish..."
+                  className="text-lg border-none flex-1 appearance-none focus:outline-none text-white bg-transparent py-1"
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  onFocus={handleSearchFocus}
+                  onKeyDown={handleKeyDown}
+                  autoComplete="off"
+                />
+                <button
+                  className="px-3 py-1 bg-white text-[#004F44] rounded hover:bg-gray-200 transition-colors font-medium text-sm flex-shrink-0"
+                  onClick={handleSearch}
+                  aria-label="Qidirish"
+                >
+                  Qidirish
+                </button>
               </div>
-            )}
+              {showSuggestions && (
+                <div
+                  ref={suggestionsRef}
+                  className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-b-lg shadow-lg z-50 max-h-48 overflow-y-auto"
+                >
+                  {filteredSuggestions.map((flower) => (
+                    <div
+                      key={flower.id}
+                      className="px-4 py-3 cursor-pointer hover:bg-gray-100 text-black border-b border-gray-100 last:border-b-0"
+                      onClick={() => handleSuggestionClick(flower)}
+                    >
+                      {flower.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* Mobile Menu */}
-      {showMobileMenu && (
-        <div className="md:hidden bg-[#004F44] border-t border-white/20">
-          <div className="px-4 py-3 space-y-2">
-            <Link
-              to="/admin"
-              className="flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-lg transition-colors"
-              onClick={() => setShowMobileMenu(false)}
-            >
-              <FaUserShield className="text-lg" />
-              <span>Admin Panel</span>
-            </Link>
+      {
+        showMobileMenu && (
+          <div className="md:hidden bg-[#004F44] border-t border-white/20">
+            <div className="px-4 py-3 space-y-2">
+              <Link
+                to="/admin"
+                className="flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-lg transition-colors"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                <FaUserShield className="text-lg" />
+                <span>Admin Panel</span>
+              </Link>
 
-            <a
-              href="tel:+998990974203"
-              className="flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-lg transition-colors"
-              onClick={() => setShowMobileMenu(false)}
-            >
-              <FaPhone className="text-lg" />
-              <span>+998 99 097 42 03</span>
-            </a>
+              <a
+                href="tel:+998990974203"
+                className="flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-lg transition-colors"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                <FaPhone className="text-lg" />
+                <span>+998 99 097 42 03</span>
+              </a>
+            </div>
           </div>
-        </div>
-      )}
-    </header>
+        )
+      }
+    </header >
   );
 };
 
