@@ -157,7 +157,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
               {/* <h1 className="title text-4xl font-semibold text-white"> */}
               {/*   Rozoviy Sad */}
               {/* </h1> */}
-              <img className="h-25 w-100" src="./incspace-two.svg" alt="logo" />
+              <img className="h-[200px] w-[400px]" src="./incspace-two.svg" alt="logo" />
             </Link>
 
             <div className="flex gap-x-4 items-center">
