@@ -155,7 +155,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
           <div className="hidden md:flex justify-between items-center">
             <Link to={"/"} className="flex-shrink-0">
               <h1 className="title text-4xl font-semibold text-white">
-                Rozoviy Sad
+                <img src="./rozoviy-sad-logo-incspace-1.svg" alt="logo" />
               </h1>
             </Link>
 
