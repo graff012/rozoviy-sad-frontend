@@ -154,9 +154,6 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
           {/* Desktop layout */}
           <div className="hidden md:flex justify-between items-center">
             <Link to={"/"}>
-              {/* <h1 className="title text-4xl font-semibold text-white"> */}
-              {/*   Rozoviy Sad */}
-              {/* </h1> */}
               <img src="./incspace-ten.svg" alt="logo" />
             </Link>
 
@@ -238,9 +235,6 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
           <div className="md:hidden">
             <div className="flex justify-between items-center">
               <Link to={"/"} className="flex-shrink-0">
-                {/* <h1 className="title text-2xl font-semibold text-white"> */}
-                {/*   Rozoviy Sad */}
-                {/* </h1> */}
                 <img src="./incspace-seven.svg" alt="logo" />
               </Link>
 
