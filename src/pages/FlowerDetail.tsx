@@ -17,6 +17,22 @@ interface Flower {
 }
 
 const FlowerDetail = () => {
+  // Map enum/string smell values to Russian labels for UI only
+  const formatSmell = (value: string): string => {
+    if (!value) return "";
+    const key = value.toUpperCase().replace(/\s+/g, "_");
+    const map: Record<string, string> = {
+      WEAK: "Слабый",
+      AVERAGE: "Средний",
+      STRONG: "Сильный",
+      VERY_STRONG: "Очень сильный",
+      // Common fallbacks
+      LOW: "Слабый",
+      MEDIUM: "Средний",
+      HIGH: "Сильный",
+    };
+    return map[key] || value;
+  };
   const { id } = useParams<{ id: string }>();
   const [flower, setFlower] = useState<Flower | null>(null);
   const [loading, setLoading] = useState(true);
@@ -227,7 +243,7 @@ const FlowerDetail = () => {
                 </div>
 
                 <p className="mt-4 text-gray-600">
-                  <span className="font-semibold">Аромат:</span> {flower.smell}
+                  <span className="font-semibold">Аромат:</span> {formatSmell(flower.smell)}
                 </p>
                 <p className="mt-2 text-2xl font-bold text-gray-900">
                   {flower.price} so'm
@@ -287,7 +303,7 @@ const FlowerDetail = () => {
 
               <div className="bg-gray-50 rounded-lg p-4 mb-6">
                 <p className="text-gray-700">
-                  <span className="font-semibold">Аромат:</span> {flower.smell}
+                  <span className="font-semibold">Аромат:</span> {formatSmell(flower.smell)}
                 </p>
               </div>
 
