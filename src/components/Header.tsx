@@ -36,6 +36,8 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement | null>(null);
+  const [showContacts, setShowContacts] = useState(false);
+  const contactsRef = useRef<HTMLDivElement | null>(null);
   const { itemCount } = useCart();
 
   // Fetch all flowers for autocomplete
@@ -86,14 +88,20 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
     }
   }, [inputValue, flowers]);
 
-  // Hide suggestions on outside click
+  // Hide suggestions/contacts on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        suggestionsRef.current &&
-        !suggestionsRef.current.contains(event.target as Node)
-      ) {
+      const target = event.target as Node;
+      const suggestionsClickedInside =
+        suggestionsRef.current && suggestionsRef.current.contains(target);
+      const contactsClickedInside =
+        contactsRef.current && contactsRef.current.contains(target);
+
+      if (!suggestionsClickedInside) {
         setShowSuggestions(false);
+      }
+      if (!contactsClickedInside) {
+        setShowContacts(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -139,11 +147,20 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
   const toggleMobileMenu = () => {
     setShowMobileMenu(!showMobileMenu);
     setShowMobileSearch(false);
+    setShowContacts(false);
   };
 
   const toggleMobileSearch = () => {
     setShowMobileSearch(!showMobileSearch);
     setShowMobileMenu(false);
+    setShowContacts(false);
+  };
+
+  const toggleContacts = () => {
+    setShowContacts((prev) => !prev);
+    setShowSuggestions(false);
+    setShowMobileMenu(false);
+    setShowMobileSearch(false);
   };
 
   return (
@@ -220,14 +237,44 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
                 <FaUserShield className="text-white group-hover:scale-110 transition-transform text-lg" />
               </Link>
 
-              <a
-                href="tel:+998904979797"
-                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/30 rounded-lg text-white font-medium transition-colors group"
-              >
-                <FaPhone className="group-hover:scale-110 transition-transform" />
-                <span className="hidden lg:inline">+998 90 497 97 97</span>
-                <span className="lg:hidden">Call</span>
-              </a>
+              <div className="relative" ref={contactsRef}>
+                <button
+                  onClick={toggleContacts}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/30 rounded-lg text-white font-medium transition-colors group"
+                  aria-expanded={showContacts}
+                  aria-haspopup="true"
+                >
+                  <FaPhone className="group-hover:scale-110 transition-transform" />
+                  <span className="hidden lg:inline">Aloqa</span>
+                  <span className="lg:hidden">Aloqa</span>
+                </button>
+
+                {showContacts && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-50">
+                    <a
+                      href="tel:+998904979797"
+                      className="flex items-center gap-2 p-2 rounded hover:bg-gray-100 text-[#004F44]"
+                    >
+                      <FaPhone />
+                      <span className="text-sm">+998 90 497 97 97  (Nozimjon)</span>
+                    </a>
+                    <a
+                      href="tel:+998916714555"
+                      className="flex items-center gap-2 p-2 rounded hover:bg-gray-100 text-[#004F44]"
+                    >
+                      <FaPhone />
+                      <span className="text-sm">+998 91 671 45 55  (G'ayratjon)</span>
+                    </a>
+                    <a
+                      href="tel:+998935483368"
+                      className="flex items-center gap-2 p-2 rounded hover:bg-gray-100 text-[#004F44]"
+                    >
+                      <FaPhone />
+                      <span className="text-sm">+998 93 548 33 68  (Олеся)</span>
+                    </a>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
