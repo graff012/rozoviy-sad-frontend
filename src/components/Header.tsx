@@ -346,7 +346,25 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
                 onClick={() => setShowMobileMenu(false)}
               >
                 <FaPhone className="text-lg" />
-                <span>+998 90 497 97 97</span>
+                <span>+998 90 497 97 97  (Nozimjon)</span>
+              </a>
+
+              <a
+                href="tel:+998916714555"
+                className="flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-lg transition-colors"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                <FaPhone className="text-lg" />
+                <span>+998 91 671 45 55  (G'ayratjon)</span>
+              </a>
+
+              <a
+                href="tel:+998935483368"
+                className="flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-lg transition-colors"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                <FaPhone className="text-lg" />
+                <span>+998 93 548 33 68  (Олеся)</span>
               </a>
             </div>
           </div>
