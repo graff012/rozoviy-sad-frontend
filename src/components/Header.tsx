@@ -256,21 +256,21 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
                       className="flex items-center gap-2 p-2 rounded hover:bg-gray-100 text-[#004F44]"
                     >
                       <FaPhone />
-                      <span className="text-sm">+998 90 497 97 97  (Nozimjon)</span>
+                      <span className="text-sm">+998 90 497 97 97  Нозимжон</span>
                     </a>
                     <a
                       href="tel:+998916714555"
                       className="flex items-center gap-2 p-2 rounded hover:bg-gray-100 text-[#004F44]"
                     >
                       <FaPhone />
-                      <span className="text-sm">+998 91 671 45 55  (G'ayratjon)</span>
+                      <span className="text-sm">+998 91 671 45 55  Ғайратжон</span>
                     </a>
                     <a
                       href="tel:+998935483368"
                       className="flex items-center gap-2 p-2 rounded hover:bg-gray-100 text-[#004F44]"
                     >
                       <FaPhone />
-                      <span className="text-sm">+998 93 548 33 68  (Олеся)</span>
+                      <span className="text-sm">+998 93 548 33 68  Олеся</span>
                     </a>
                   </div>
                 )}
@@ -393,7 +393,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
                 onClick={() => setShowMobileMenu(false)}
               >
                 <FaPhone className="text-lg" />
-                <span>+998 90 497 97 97  (Nozimjon)</span>
+                <span>+998 90 497 97 97  Нозимжон</span>
               </a>
 
               <a
@@ -402,7 +402,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
                 onClick={() => setShowMobileMenu(false)}
               >
                 <FaPhone className="text-lg" />
-                <span>+998 91 671 45 55  (G'ayratjon)</span>
+                <span>+998 91 671 45 55  Ғайратжон</span>
               </a>
 
               <a
@@ -411,7 +411,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
                 onClick={() => setShowMobileMenu(false)}
               >
                 <FaPhone className="text-lg" />
-                <span>+998 93 548 33 68  (Олеся)</span>
+                <span>+998 93 548 33 68  Олеся</span>
               </a>
             </div>
           </div>
