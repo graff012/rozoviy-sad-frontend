@@ -114,10 +114,11 @@ const Cart = () => {
     doc.setFontSize(11);
     doc.text(`Quyidagi karta raqamiga to'lov qiling`, 20, yPosition + 40);
     doc.text(`Karta raqami: ${CARD_NUMBER}`, 20, yPosition + 50);
+    doc.text(`To'lov screenshotini https://t.me/tt_me12 ga telegramdan yuboring`, 20, yPosition + 60);
     doc.setFontSize(12);
-    doc.text(`To'lov muddati: 10 kun ichida`, 20, yPosition + 60);
+    doc.text(`To'lov muddati: 10 kun ichida`, 20, yPosition + 70);
     doc.setFontSize(10);
-    doc.text(`Sana: ${new Date().toLocaleDateString()}`, 20, yPosition + 70);
+    doc.text(`Sana: ${new Date().toLocaleDateString()}`, 20, yPosition + 80);
 
     doc.save(`buyurtma_${new Date().getTime()}.pdf`);
     return true;
