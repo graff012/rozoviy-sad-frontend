@@ -257,15 +257,14 @@ const FlowerGrid = ({ searchTerm, selectedCategoryId }: FlowerGridProps) => {
                       addedToCart[flower.id] ||
                       cartItems.some((item) => item.id === flower.id)
                     }
-                    className={`w-full font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg ${
-                      addedToCart[flower.id] ||
+                    className={`w-full font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg ${addedToCart[flower.id] ||
                       cartItems.some((item) => item.id === flower.id)
-                        ? "bg-green-600 hover:bg-green-700"
-                        : "bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800"
-                    } text-white`}
+                      ? "bg-green-600 hover:bg-green-700"
+                      : "bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+                      } text-white`}
                   >
                     {addedToCart[flower.id] ||
-                    cartItems.some((item) => item.id === flower.id)
+                      cartItems.some((item) => item.id === flower.id)
                       ? "Savatga qo'shildi"
                       : "Savatga qo'shish"}
                   </button>
