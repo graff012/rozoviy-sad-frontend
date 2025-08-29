@@ -110,7 +110,7 @@ const Cart = () => {
     //   return text.replace(/[А-я]/g, (char) => cyrillicToLatin[char] || char);
     // };
 
-    doc.setFont("helvetica", "normal");
+    doc.setFont("courier", "normal");
     let yPosition = 110;
     cartItems.forEach((item) => {
 
