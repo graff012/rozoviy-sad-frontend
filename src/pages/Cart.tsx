@@ -68,6 +68,8 @@ const Cart = () => {
     const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
 
+    doc.setFont('helvetica', 'normal')
+
     doc.setFontSize(20);
     doc.setTextColor(40, 40, 40);
     doc.text("Rozoviy Sad", 105, 20, { align: "center" });
@@ -93,6 +95,7 @@ const Cart = () => {
     doc.setFont("helvetica", "normal");
     let yPosition = 110;
     cartItems.forEach((item) => {
+      console.log('written item name: ', item.name)
       const itemTotal = Number(item.price) * item.quantity;
       doc.text(item.name, 25, yPosition);
       doc.text(`${Number(item.price).toLocaleString()} UZS`, 100, yPosition);
@@ -102,6 +105,13 @@ const Cart = () => {
       });
       yPosition += 10;
     });
+
+    console.log('Cart items for PDF:', cartItems.map(item => ({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity
+    })));
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
