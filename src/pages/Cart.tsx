@@ -68,18 +68,19 @@ const Cart = () => {
     const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
 
-    try {
-      const fontResponse = await fetch('./../assets/fonts/encoded-utpolnuma.txt')
-      const base64font = await fontResponse.text()
-      doc.addFileToVFS('UTPolnumaDemo-Regular.otf', base64font)
-      doc.addFont('UTPolnumaDemo-Regular.otf', 'UTPolnumaDemo', 'normal')
-      doc.setFont('UTPolnumaDemo')
-    } catch (err) {
-      console.error('font loading failed: ', err)
-      doc.setFont('helvetica', 'normal')
-    }
+    // try {
+    //   const fontResponse = await fetch('./../assets/fonts/encoded-utpolnuma.txt')
+    //   const base64font = await fontResponse.text()
+    //   doc.addFileToVFS('UTPolnumaDemo-Regular.otf', base64font)
+    //   doc.addFont('UTPolnumaDemo-Regular.otf', 'UTPolnumaDemo', 'normal')
+    //   doc.setFont('UTPolnumaDemo')
+    // } catch (err) {
+    //   console.error('font loading failed: ', err)
+    //   doc.setFont('helvetica', 'normal')
+    // }
 
 
+    // doc.setFont('helvetica', 'normal')
     doc.setFontSize(20);
     doc.setTextColor(40, 40, 40);
     doc.text("Rozoviy Sad", 105, 20, { align: "center" });
