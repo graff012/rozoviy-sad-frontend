@@ -1,5 +1,4 @@
 import { useState } from "react";
-import base64font from './../assets/fonts/encoded-utpolnuma.txt'
 import { useCart } from "../contexts/CartContext";
 import { useOrders } from "../contexts/OrdersContext";
 import { Link, useNavigate } from "react-router-dom";
@@ -69,9 +68,17 @@ const Cart = () => {
     const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
 
-    doc.addFileToVFS('UTPolnumaDemo-Regular.otf', base64font)
-    doc.addFont('UTPolnumaDemo-Regular.otf', 'UTPolnumaDemo', 'normal')
-    doc.setFont('UTPolnumaDemo')
+    try {
+      const fontResponse = await fetch('./../assets/fonts/encoded-utpolnuma.txt')
+      const base64font = await fontResponse.text()
+      doc.addFileToVFS('UTPolnumaDemo-Regular.otf', base64font)
+      doc.addFont('UTPolnumaDemo-Regular.otf', 'UTPolnumaDemo', 'normal')
+      doc.setFont('UTPolnumaDemo')
+    } catch (err) {
+      console.error('font loading failed: ', err)
+      doc.setFont('helvetica', 'normal')
+    }
+
 
     doc.setFontSize(20);
     doc.setTextColor(40, 40, 40);
