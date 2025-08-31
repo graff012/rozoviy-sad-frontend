@@ -50,6 +50,21 @@ export const AdminPanel = () => {
     return `${BASE_URL}/${imagePath}`;
   };
 
+  // Helper function to get Russian smell display text
+  const getSmellDisplayText = (value: string) => {
+    const map: Record<string, string> = {
+      WEAK: "Слабый",
+      AVERAGE: "Средний",
+      STRONG: "Сильный",
+      VERY_STRONG: "Очень сильный",
+      // Common fallbacks
+      LOW: "Слабый",
+      MEDIUM: "Средний",
+      HIGH: "Сильный",
+    };
+    return map[value] || value; // default to original if unknown
+  };
+
   // Enhanced authenticated request function for iPhone compatibility
   const makeAuthenticatedRequest = async (url: string, options: RequestInit = {}) => {
     try {
@@ -597,10 +612,10 @@ export const AdminPanel = () => {
                       className="w-full border border-[#e7d6e0] rounded py-2 px-3 bg-white text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#f2b5d4]"
                     >
                       <option value="">Выберите силу аромата</option>
-                      <option value="WEAK">слабый</option>
-                      <option value="AVERAGE">средний</option>
-                      <option value="STRONG">сильный</option>
-                      <option value="VERY_STRONG">очень сильный</option>
+                      <option value="WEAK">Слабый</option>
+                      <option value="AVERAGE">Средний</option>
+                      <option value="STRONG">Сильный</option>
+                      <option value="VERY_STRONG">Очень сильный</option>
                     </select>
                   </div>
 
@@ -750,7 +765,7 @@ export const AdminPanel = () => {
                             <strong>Размер цветка:</strong> {flower.flowerSize || "–"}
                           </div>
                           <div className="text-sm text-black mb-1">
-                            <strong>Аромат:</strong> {flower.smell || "–"}
+                            <strong>Аромат:</strong> {getSmellDisplayText(flower.smell)}
                           </div>
                           <div className="text-sm text-black mb-2">
                             <strong>Высота:</strong> {flower.height || "–"}
@@ -805,7 +820,7 @@ export const AdminPanel = () => {
                           </div>
                           <div className="w-1/4 text-black">
                             <div>{flower.flowerSize || "–"}</div>
-                            <div className="text-sm text-gray-600">{flower.smell || "–"}</div>
+                            <div className="text-sm text-gray-600">{getSmellDisplayText(flower.smell)}</div>
                           </div>
                           <div className="w-1/4 text-black">{flower.height || "–"}</div>
                           <div className="w-1/4 flex gap-x-2">
