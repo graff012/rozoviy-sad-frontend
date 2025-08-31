@@ -23,17 +23,10 @@ type Flower = {
   price: string;
 };
 
-// BASE_URL is derived in config
-console.log(BASE_URL)
-
 export const AdminPanel = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<
-    "flowers" | "categories" | "orders"
-  >("flowers");
-  const [formData, setFormData] = useState<
-    Omit<Flower, "id"> & { imageFile: File | null }
-  >({
+  const [activeTab, setActiveTab] = useState<"flowers" | "categories" | "orders">("flowers");
+  const [formData, setFormData] = useState<Omit<Flower, "id"> & { imageFile: File | null }>({
     name: "",
     smell: "",
     flowerSize: "",
@@ -53,70 +46,54 @@ export const AdminPanel = () => {
   // Helper function to construct image URL
   const getImageUrl = (imgUrl: string) => {
     if (!imgUrl) return '';
-
-    // If imgUrl already starts with 'images/', use it as is
-    // If it's just a filename, prepend 'images/'
     const imagePath = imgUrl.startsWith('images/') ? imgUrl : `images/${imgUrl}`;
-
-    // Construct full URL
     return `${BASE_URL}/${imagePath}`;
   };
 
-  // Log active tab changes
-  useEffect(() => {
-    console.log('Active tab changed to:', activeTab);
-  }, [activeTab]);
+  // Enhanced authenticated request function for iPhone compatibility
+  const makeAuthenticatedRequest = async (url: string, options: RequestInit = {}) => {
+    try {
+      console.log(`Making request to: ${url}`, { options });
 
-  // Handle Escape key for modal close
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && showConfirmDialog) {
-        cancelDelete();
+      const enhancedOptions: RequestInit = {
+        ...options,
+        credentials: "include",
+        headers: {
+          ...options.headers,
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+        },
+      };
+
+      // For iPhone/Safari, also try to get token from localStorage as fallback
+      const token = localStorage.getItem('authToken');
+      if (token && !options.headers?.['Authorization']) {
+        enhancedOptions.headers = {
+          ...enhancedOptions.headers,
+          'Authorization': `Bearer ${token}`,
+        };
       }
-    };
-    window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
-  }, [showConfirmDialog]);
 
-  // Authentication check - Always require fresh login for admin access
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        // Always clear existing auth and force login for admin panel access
-        console.log("Admin panel access - requiring fresh login");
+      const response = await fetch(url, enhancedOptions);
+      console.log(`Response status for ${url}:`, response.status);
+
+      if (response.status === 401 || response.status === 403) {
+        console.log("Authentication failed during request - redirecting to login");
         setIsAuthenticated(false);
-
-        // Clear any existing auth state to force fresh login
-        await fetch(`${API_URL}/auth/logout`, {
-          method: "POST",
-          credentials: "include",
-        });
-
-        document.cookie =
-          "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        navigate("/admin-login", {
-          replace: true,
-          state: { message: "Please login to access admin panel" },
-        });
-      } catch (error) {
-        console.error("Auth cleanup failed:", error);
-        setIsAuthenticated(false);
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        localStorage.removeItem('authToken');
         navigate("/admin-login", { replace: true });
+        throw new Error("Authentication failed");
       }
-    };
 
-    // Only run auth check if we don't have a fresh login flag
-    const hasRecentLogin =
-      sessionStorage.getItem("adminLoginSuccess") === "true";
-
-    if (!hasRecentLogin) {
-      checkAuth();
-    } else {
-      // User has fresh login, verify their authentication
-      verifyAuthentication();
+      return response;
+    } catch (error) {
+      console.error(`Request failed for ${url}:`, error);
+      throw error;
     }
-  }, [navigate]);
+  };
 
+  // Authentication verification
   const verifyAuthentication = async () => {
     try {
       const response = await fetch(`${API_URL}/auth/check`, {
@@ -124,6 +101,8 @@ export const AdminPanel = () => {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
         },
       });
 
@@ -131,7 +110,10 @@ export const AdminPanel = () => {
         const data = await response.json();
         if (data.authenticated === true) {
           setIsAuthenticated(true);
-          // Clear the login success flag after successful verification
+          // Store token in localStorage as fallback for iPhone
+          if (data.token) {
+            localStorage.setItem('authToken', data.token);
+          }
           sessionStorage.removeItem("adminLoginSuccess");
         } else {
           setIsAuthenticated(false);
@@ -148,62 +130,16 @@ export const AdminPanel = () => {
     }
   };
 
-  // Load initial data only after authentication is confirmed
-  useEffect(() => {
-    if (isAuthenticated === true) {
-      fetchCategories();
-      fetchFlowers();
-    }
-  }, [isAuthenticated]);
-
-  // Enhanced API call function with better error handling
-  const makeAuthenticatedRequest = async (
-    url: string,
-    options: RequestInit = {}
-  ) => {
-    try {
-      console.log(`Making request to: ${url}`, { options });
-      const response = await fetch(url, {
-        ...options,
-        credentials: "include",
-        headers: {
-          ...options.headers,
-          // Don't set Content-Type for FormData, let browser handle it
-        },
-      });
-
-      console.log(`Response status for ${url}:`, response.status);
-
-      if (response.status === 401 || response.status === 403) {
-        console.log(
-          "Authentication failed during request - redirecting to login"
-        );
-        setIsAuthenticated(false);
-        document.cookie =
-          "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        navigate("/admin-login", { replace: true });
-        throw new Error("Authentication failed");
-      }
-
-      return response;
-    } catch (error) {
-      console.error(`Request failed for ${url}:`, error);
-      throw error;
-    }
-  };
-
+  // Fetch categories
   const fetchCategories = async () => {
     try {
       setLoading(true);
       console.log('Fetching categories...');
-      const res = await makeAuthenticatedRequest(
-        `${API_URL}/categories`
-      );
+      const res = await makeAuthenticatedRequest(`${API_URL}/categories`);
 
       if (res.ok) {
         const data = await res.json();
         console.log('Categories response data:', data);
-        // Handle both array response and object with categories property
         let categoriesArray = [];
         if (Array.isArray(data)) {
           categoriesArray = data;
@@ -212,7 +148,7 @@ export const AdminPanel = () => {
         }
         console.log('Processed categories array:', categoriesArray);
         setCategories(categoriesArray);
-        // Set default category if none is selected and categories exist
+
         if (categoriesArray.length > 0 && !formData.categoryId) {
           setFormData((prevValue) => ({
             ...prevValue,
@@ -238,17 +174,15 @@ export const AdminPanel = () => {
     }
   };
 
+  // Fetch flowers
   const fetchFlowers = async () => {
     try {
       console.log('Fetching flowers...');
-      const res = await makeAuthenticatedRequest(
-        `${API_URL}/flowers`
-      );
+      const res = await makeAuthenticatedRequest(`${API_URL}/flowers`);
 
       if (res.ok) {
         const data = await res.json();
         console.log('Flowers response data:', data);
-        // Handle both array response and object with flowers property
         let flowersArray = [];
         if (Array.isArray(data)) {
           flowersArray = data;
@@ -274,6 +208,7 @@ export const AdminPanel = () => {
     }
   };
 
+  // Handle logout
   const handleLogout = async () => {
     try {
       await fetch(`${API_URL}/auth/logout`, {
@@ -283,17 +218,15 @@ export const AdminPanel = () => {
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      // Clear auth state and redirect regardless of logout API success
       setIsAuthenticated(false);
-      document.cookie =
-        "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      localStorage.removeItem('authToken');
       navigate("/", { replace: true });
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  // Handle form changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -303,14 +236,13 @@ export const AdminPanel = () => {
     setFormData((prev) => ({ ...prev, imageFile: file }));
   };
 
+  // Handle save/create flower
   const handleSave = async () => {
-    // Validate required fields
     if (!formData.name.trim() || !formData.price || !formData.categoryId) {
       alert("Iltimos, barcha majburiy maydonlarni to'ldiring (Nomi, Narxi, Kategoriya)");
       return;
     }
 
-    // Validate price
     const priceValue = parseFloat(formData.price);
     if (isNaN(priceValue) || priceValue <= 0) {
       alert("Iltimos, 0 dan katta bo'lgan to'g'ri narxni kiriting");
@@ -324,11 +256,9 @@ export const AdminPanel = () => {
         await handleUpdate();
       } else {
         const formDataToSend = new FormData();
-
-        // Make sure all field names match your DTO exactly
         formDataToSend.append("name", formData.name.trim());
         formDataToSend.append("smell", formData.smell || "");
-        formDataToSend.append("flowerSize", formData.flowerSize || ""); // Keep consistent
+        formDataToSend.append("flowerSize", formData.flowerSize || "");
         formDataToSend.append("height", formData.height || "");
         formDataToSend.append("categoryId", formData.categoryId);
         formDataToSend.append("price", formData.price);
@@ -337,22 +267,19 @@ export const AdminPanel = () => {
           formDataToSend.append("image", formData.imageFile);
         }
 
-        // Debug: Log what we're sending
         console.log("FormData contents:");
         for (const [key, value] of formDataToSend.entries()) {
           console.log(key, value);
         }
 
-        const res = await fetch(`${API_URL}/flowers/create`, {
+        const res = await makeAuthenticatedRequest(`${API_URL}/flowers/create`, {
           method: "POST",
-          credentials: 'include',
           body: formDataToSend,
         });
 
         if (res.ok) {
           console.log("Flower created successfully");
           await fetchFlowers();
-          // Reset form
           setFormData({
             name: "",
             smell: "",
@@ -362,7 +289,6 @@ export const AdminPanel = () => {
             categoryId: categories.length > 0 ? categories[0].id : "",
             price: "",
           });
-          // Reset file input
           const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
           if (fileInput) {
             fileInput.value = "";
@@ -372,7 +298,13 @@ export const AdminPanel = () => {
           const errorText = await res.text();
           console.error("Failed to add flower:", res.status, errorText);
 
-          // Try to parse error as JSON for better debugging
+          if (res.status === 401 || res.status === 403) {
+            alert("Autentifikatsiya muammosi. Iltimos, qaytadan kiring.");
+            setIsAuthenticated(false);
+            navigate("/admin-login", { replace: true });
+            return;
+          }
+
           try {
             const errorJson = JSON.parse(errorText);
             console.error("Parsed error:", errorJson);
@@ -392,11 +324,11 @@ export const AdminPanel = () => {
     }
   };
 
+  // Handle update flower
   const handleUpdate = async () => {
     if (!editingId) return;
 
     const formDataToSend = new FormData();
-
     formDataToSend.append("name", formData.name);
     formDataToSend.append("price", formData.price);
     formDataToSend.append("category_id", formData.categoryId);
@@ -407,13 +339,10 @@ export const AdminPanel = () => {
       formDataToSend.append("image", formData.imageFile);
     }
 
-    const res = await makeAuthenticatedRequest(
-      `${API_URL}/flowers/${editingId}`,
-      {
-        method: "PUT",
-        body: formDataToSend,
-      }
-    );
+    const res = await makeAuthenticatedRequest(`${API_URL}/flowers/${editingId}`, {
+      method: "PUT",
+      body: formDataToSend,
+    });
 
     if (res.ok) {
       const updated = await res.json();
@@ -428,10 +357,7 @@ export const AdminPanel = () => {
         categoryId: categories.length > 0 ? categories[0].id : "",
         price: "",
       });
-      // Reset file input
-      const fileInput = document.querySelector(
-        'input[type="file"]'
-      ) as HTMLInputElement;
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
       if (fileInput) {
         fileInput.value = "";
       }
@@ -443,6 +369,7 @@ export const AdminPanel = () => {
     }
   };
 
+  // Handle edit click
   const handleEditClick = (flower: Flower) => {
     setFormData({
       name: flower.name,
@@ -456,6 +383,7 @@ export const AdminPanel = () => {
     setEditingId(flower.id);
   };
 
+  // Handle cancel edit
   const handleCancelEdit = () => {
     setEditingId(null);
     setFormData({
@@ -467,15 +395,13 @@ export const AdminPanel = () => {
       categoryId: categories.length > 0 ? categories[0].id : "",
       price: "",
     });
-    // Reset file input
-    const fileInput = document.querySelector(
-      'input[type="file"]'
-    ) as HTMLInputElement;
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     if (fileInput) {
       fileInput.value = "";
     }
   };
 
+  // Handle delete
   const handleDelete = (id: string) => {
     setFlowerIdToDelete(id);
     setShowConfirmDialog(true);
@@ -485,12 +411,9 @@ export const AdminPanel = () => {
     if (!flowerIdToDelete) return;
 
     try {
-      const res = await makeAuthenticatedRequest(
-        `${API_URL}/flowers/${flowerIdToDelete}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const res = await makeAuthenticatedRequest(`${API_URL}/flowers/${flowerIdToDelete}`, {
+        method: "DELETE",
+      });
 
       if (res.ok) {
         setFlowers(flowers.filter((f) => f.id !== flowerIdToDelete));
@@ -515,6 +438,64 @@ export const AdminPanel = () => {
     setShowConfirmDialog(false);
     setFlowerIdToDelete(null);
   };
+
+  // Effects
+  useEffect(() => {
+    console.log('Active tab changed to:', activeTab);
+  }, [activeTab]);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && showConfirmDialog) {
+        cancelDelete();
+      }
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [showConfirmDialog]);
+
+  // Authentication check
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        console.log("Admin panel access - requiring fresh login");
+        setIsAuthenticated(false);
+
+        await fetch(`${API_URL}/auth/logout`, {
+          method: "POST",
+          credentials: "include",
+        });
+
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        localStorage.removeItem('authToken');
+
+        navigate("/admin-login", {
+          replace: true,
+          state: { message: "Please login to access admin panel" },
+        });
+      } catch (error) {
+        console.error("Auth cleanup failed:", error);
+        setIsAuthenticated(false);
+        navigate("/admin-login", { replace: true });
+      }
+    };
+
+    const hasRecentLogin = sessionStorage.getItem("adminLoginSuccess") === "true";
+
+    if (!hasRecentLogin) {
+      checkAuth();
+    } else {
+      verifyAuthentication();
+    }
+  }, [navigate]);
+
+  // Load data after authentication
+  useEffect(() => {
+    if (isAuthenticated === true) {
+      fetchCategories();
+      fetchFlowers();
+    }
+  }, [isAuthenticated]);
 
   // Show loading state while checking authentication
   if (isAuthenticated === null) {
@@ -732,7 +713,6 @@ export const AdminPanel = () => {
 
               {/* Flower List */}
               <div className="bg-white rounded-lg shadow border border-[#f0e5ef] overflow-hidden">
-                {/* Header - Hidden on small screens, shown as labels inside rows */}
                 <div className="hidden sm:flex bg-[#fdf6f9] border-b border-[#f0e5ef] font-semibold text-black px-6 py-3">
                   <div className="w-1/4">Gul</div>
                   <div className="w-1/4">Размер / Аромат</div>
@@ -740,32 +720,22 @@ export const AdminPanel = () => {
                   <div className="w-1/4">Amallar</div>
                 </div>
 
-                {/* Mobile-first scrollable wrapper for small screens */}
+                {/* Mobile View */}
                 <div className="sm:hidden">
                   {flowers.length === 0 ? (
                     <div className="px-4 py-4 text-center text-gray-500">Hali gullar qo'shilmagan.</div>
                   ) : (
                     flowers.map((flower) => {
                       const imageUrl = flower.imgUrl ? getImageUrl(flower.imgUrl) : '';
-                      console.log('Mobile - Flower:', flower.name, 'imgUrl:', flower.imgUrl, 'Final URL:', imageUrl);
-
                       return (
-                        <div
-                          key={flower.id}
-                          className="border-b border-[#f0e5ef] p-4 hover:bg-[#fff7fa] transition"
-                        >
+                        <div key={flower.id} className="border-b border-[#f0e5ef] p-4 hover:bg-[#fff7fa] transition">
                           <div className="flex items-center gap-x-3 mb-2">
                             {flower.imgUrl && (
                               <img
                                 src={imageUrl}
                                 alt={flower.name}
                                 className="w-12 h-12 object-cover rounded-md"
-                                onLoad={() => console.log('✅ Image loaded successfully:', imageUrl)}
-                                onError={(e) => {
-                                  console.error('❌ Image failed to load:', imageUrl);
-                                  console.error('Error event:', e);
-                                  (e.target as HTMLImageElement).style.display = 'none';
-                                }}
+                                onError={(e) => (e.target as HTMLImageElement).style.display = 'none'}
                               />
                             )}
                             <div>
@@ -811,8 +781,6 @@ export const AdminPanel = () => {
                   ) : (
                     flowers.map((flower) => {
                       const imageUrl = flower.imgUrl ? getImageUrl(flower.imgUrl) : '';
-                      console.log('Desktop - Flower:', flower.name, 'imgUrl:', flower.imgUrl, 'Final URL:', imageUrl);
-
                       return (
                         <div
                           key={flower.id}
@@ -824,12 +792,7 @@ export const AdminPanel = () => {
                                 src={imageUrl}
                                 alt={flower.name}
                                 className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-md"
-                                onLoad={() => console.log('✅ Desktop image loaded successfully:', imageUrl)}
-                                onError={(e) => {
-                                  console.error('❌ Desktop image failed to load:', imageUrl);
-                                  console.error('Error event:', e);
-                                  (e.target as HTMLImageElement).style.display = 'none';
-                                }}
+                                onError={(e) => (e.target as HTMLImageElement).style.display = 'none'}
                               />
                             )}
                             <div>
