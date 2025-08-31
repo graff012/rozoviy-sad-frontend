@@ -775,13 +775,13 @@ export const AdminPanel = () => {
                               onClick={() => handleEditClick(flower)}
                               className="text-xs sm:text-sm bg-[#fdf6f9] hover:bg-[#ffe3f0] text-black px-3 py-1 rounded transition"
                             >
-                              Tahrirlash
+                              Edit
                             </button>
                             <button
                               onClick={() => handleDelete(flower.id)}
                               className="text-xs sm:text-sm bg-[#ffeef0] hover:bg-red-200 text-[#e57373] px-3 py-1 rounded transition"
                             >
-                              O'chirish
+                              Delete
                             </button>
                           </div>
                         </div>
