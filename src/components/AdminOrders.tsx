@@ -167,63 +167,37 @@ const OrderItem = ({ order, onStatusChange, onDelete }: OrderItemProps) => {
   );
 };
 
-export const AdminOrders: React.FC = () => {
-  const navigate = useNavigate();
+interface AdminOrdersProps {
+  makeAuthenticatedRequest?: (url: string, options?: RequestInit) => Promise<Response>;
+}
+
+export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedRequest }) => {
   const [orders, setOrders] = useState<OrderType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Enhanced authenticated request function matching AdminPanel
-  const makeAuthenticatedRequest = async (url: string, options: RequestInit = {}) => {
-    try {
-      console.log(`Making request to: ${url}`, { options });
-
-      const enhancedOptions: RequestInit = {
-        ...options,
-        credentials: "include",
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache',
-          ...options.headers,
-        },
-      };
-
-      // For iPhone/Safari, also try to get token from localStorage as fallback
-      const token = localStorage.getItem('authToken');
-      if (token) {
-        const headers = enhancedOptions.headers as Record<string, string>;
-        if (!headers?.['Authorization']) {
-          enhancedOptions.headers = {
-            ...enhancedOptions.headers,
-            'Authorization': `Bearer ${token}`,
-          };
-        }
-      }
-
-      const response = await fetch(url, enhancedOptions);
-      console.log(`Response status for ${url}:`, response.status);
-
-      if (response.status === 401 || response.status === 403) {
-        console.log("Authentication failed during request - redirecting to login");
-        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        localStorage.removeItem('authToken');
-        navigate("/admin-login", { replace: true });
-        throw new Error("Authentication failed");
-      }
-
-      return response;
-    } catch (error) {
-      console.error(`Request failed for ${url}:`, error);
-      throw error;
-    }
+  // Fallback function if no authenticated request function is provided
+  const defaultAuthRequest = async (url: string, options: RequestInit = {}) => {
+    return fetch(url, {
+      ...options,
+      credentials: "include",
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
   };
+
+  const authRequest = makeAuthenticatedRequest || defaultAuthRequest;
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await makeAuthenticatedRequest(`${API_URL}/orders`, {
+      const response = await authRequest(`${API_URL}/orders`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -283,7 +257,7 @@ export const AdminOrders: React.FC = () => {
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
-      const response = await makeAuthenticatedRequest(`${API_URL}/orders/${orderId}`, {
+      const response = await authRequest(`${API_URL}/orders/${orderId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -314,7 +288,7 @@ export const AdminOrders: React.FC = () => {
     if (!confirmed) return;
 
     try {
-      const response = await makeAuthenticatedRequest(`${API_URL}/orders/${orderId}`, {
+      const response = await authRequest(`${API_URL}/orders/${orderId}`, {
         method: "DELETE",
       });
 
