@@ -59,19 +59,22 @@ export const AdminPanel = () => {
         ...options,
         credentials: "include",
         headers: {
-          ...options.headers,
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache',
+          ...options.headers,
         },
       };
 
       // For iPhone/Safari, also try to get token from localStorage as fallback
       const token = localStorage.getItem('authToken');
-      if (token && !options.headers?.['Authorization']) {
-        enhancedOptions.headers = {
-          ...enhancedOptions.headers,
-          'Authorization': `Bearer ${token}`,
-        };
+      if (token) {
+        const headers = enhancedOptions.headers as Record<string, string>;
+        if (!headers?.['Authorization']) {
+          enhancedOptions.headers = {
+            ...enhancedOptions.headers,
+            'Authorization': `Bearer ${token}`,
+          };
+        }
       }
 
       const response = await fetch(url, enhancedOptions);
