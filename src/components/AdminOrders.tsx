@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { API_URL } from "../config";
 
 // Type for API response: has flower.name
@@ -87,12 +88,12 @@ const OrderItem = ({ order, onStatusChange, onDelete }: OrderItemProps) => {
             value={order.status}
             onChange={(e) => onStatusChange(order.id, e.target.value)}
             className={`text-xs px-2 py-1 rounded-full font-medium ${order.status === 'completed'
-                ? 'bg-green-100 text-green-800'
-                : order.status === 'processing'
-                  ? 'bg-yellow-100 text-yellow-800'
-                  : order.status === 'cancelled'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-blue-100 text-blue-800'
+              ? 'bg-green-100 text-green-800'
+              : order.status === 'processing'
+                ? 'bg-yellow-100 text-yellow-800'
+                : order.status === 'cancelled'
+                  ? 'bg-red-100 text-red-800'
+                  : 'bg-blue-100 text-blue-800'
               }`}
           >
             <option value="pending">В ожидании</option>
@@ -126,7 +127,7 @@ const OrderItem = ({ order, onStatusChange, onDelete }: OrderItemProps) => {
         <div className="basis-[23%] text-black">
           {order.items.map((item, i) => (
             <div key={i} className="text-xs truncate">
-              {item.quantity}x {item.name}  {/* ✅ Fixed: use item.name */}
+              {item.quantity}x {item.name}
             </div>
           ))}
         </div>
@@ -136,12 +137,12 @@ const OrderItem = ({ order, onStatusChange, onDelete }: OrderItemProps) => {
             value={order.status}
             onChange={(e) => onStatusChange(order.id, e.target.value)}
             className={`px-3 py-1.5 rounded-full text-xs font-medium min-w-[120px] ${order.status === 'completed'
-                ? 'bg-green-100 text-green-800'
-                : order.status === 'processing'
-                  ? 'bg-yellow-100 text-yellow-800'
-                  : order.status === 'cancelled'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-blue-100 text-blue-800'
+              ? 'bg-green-100 text-green-800'
+              : order.status === 'processing'
+                ? 'bg-yellow-100 text-yellow-800'
+                : order.status === 'cancelled'
+                  ? 'bg-red-100 text-red-800'
+                  : 'bg-blue-100 text-blue-800'
               }`}
           >
             <option value="pending">В ожидании</option>
@@ -167,22 +168,71 @@ const OrderItem = ({ order, onStatusChange, onDelete }: OrderItemProps) => {
 };
 
 export const AdminOrders: React.FC = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<OrderType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Enhanced authenticated request function matching AdminPanel
+  const makeAuthenticatedRequest = async (url: string, options: RequestInit = {}) => {
+    try {
+      console.log(`Making request to: ${url}`, { options });
+
+      const enhancedOptions: RequestInit = {
+        ...options,
+        credentials: "include",
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+          ...options.headers,
+        },
+      };
+
+      // For iPhone/Safari, also try to get token from localStorage as fallback
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        const headers = enhancedOptions.headers as Record<string, string>;
+        if (!headers?.['Authorization']) {
+          enhancedOptions.headers = {
+            ...enhancedOptions.headers,
+            'Authorization': `Bearer ${token}`,
+          };
+        }
+      }
+
+      const response = await fetch(url, enhancedOptions);
+      console.log(`Response status for ${url}:`, response.status);
+
+      if (response.status === 401 || response.status === 403) {
+        console.log("Authentication failed during request - redirecting to login");
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        localStorage.removeItem('authToken');
+        navigate("/admin-login", { replace: true });
+        throw new Error("Authentication failed");
+      }
+
+      return response;
+    } catch (error) {
+      console.error(`Request failed for ${url}:`, error);
+      throw error;
+    }
+  };
+
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/orders`, {
+      setError(null);
+
+      const response = await makeAuthenticatedRequest(`${API_URL}/orders`, {
         method: "GET",
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
       });
 
-      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
 
       const rawData = await response.json();
       console.log("Raw API response:", rawData);
@@ -193,7 +243,7 @@ export const AdminOrders: React.FC = () => {
 
       const mappedOrders: OrderType[] = apiOrders.map((order) => {
         const items = (order.items || []).map((item) => ({
-          name: item.flower?.name || "Noma'lum mahsulot", // ✅ Extract name here
+          name: item.flower?.name || "Noma'lum mahsulot",
           quantity: item.quantity || 1,
           price: item.price || 0,
           total: (item.quantity || 0) * (item.price || 0),
@@ -218,8 +268,10 @@ export const AdminOrders: React.FC = () => {
 
       setOrders(mappedOrders);
     } catch (err) {
-      console.error("Failed to fetch orders:", err);
-      setError("Ошибка при загрузке заказов.");
+      if (err instanceof Error && err.message !== "Authentication failed") {
+        console.error("Failed to fetch orders:", err);
+        setError("Ошибка при загрузке заказов.");
+      }
     } finally {
       setLoading(false);
     }
@@ -231,9 +283,8 @@ export const AdminOrders: React.FC = () => {
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
-      const response = await fetch(`${API_URL}/orders/${orderId}`, {
+      const response = await makeAuthenticatedRequest(`${API_URL}/orders/${orderId}`, {
         method: "PUT",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
@@ -251,8 +302,10 @@ export const AdminOrders: React.FC = () => {
         alert("Ошибка при обновлении статуса.");
       }
     } catch (err) {
-      console.error("Network error:", err);
-      alert("Сетевая ошибка. Проверьте интернет.");
+      if (err instanceof Error && err.message !== "Authentication failed") {
+        console.error("Network error:", err);
+        alert("Сетевая ошибка. Проверьте интернет.");
+      }
     }
   };
 
@@ -261,9 +314,8 @@ export const AdminOrders: React.FC = () => {
     if (!confirmed) return;
 
     try {
-      const response = await fetch(`${API_URL}/orders/${orderId}`, {
+      const response = await makeAuthenticatedRequest(`${API_URL}/orders/${orderId}`, {
         method: "DELETE",
-        credentials: "include",
       });
 
       if (response.ok) {
@@ -275,8 +327,10 @@ export const AdminOrders: React.FC = () => {
         alert("Ошибка при удалении заказа.");
       }
     } catch (err) {
-      console.error("Network error:", err);
-      alert("Сетевая ошибка. Проверьте интернет.");
+      if (err instanceof Error && err.message !== "Authentication failed") {
+        console.error("Network error:", err);
+        alert("Сетевая ошибка. Проверьте интернет.");
+      }
     }
   };
 
