@@ -24,7 +24,7 @@ const AdminLogin = () => {
     e.preventDefault();
 
     if (!formData.phoneNumber || !formData.password) {
-      setError("Iltimos, barcha maydonlarni to'ldiring");
+      setError("Iltimos, Barcha maydonlarni to'ldiring");
       return;
     }
 
