@@ -177,6 +177,7 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedReque
 
   // Fallback function if no authenticated request function is provided
   const defaultAuthRequest = async (url: string, options: RequestInit = {}) => {
+    const token = localStorage.getItem('authToken');
     return fetch(url, {
       ...options,
       credentials: "include",
@@ -184,6 +185,7 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedReque
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache',
         'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` }),
         ...options.headers,
       },
     });
@@ -196,14 +198,30 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedReque
       setLoading(true);
       setError(null);
 
-      const response = await authRequest(`${API_URL}/orders`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      // First try with the provided auth function, but catch auth failures
+      let response;
+      try {
+        response = await authRequest(`${API_URL}/orders`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      } catch (authError) {
+        if (authError instanceof Error && authError.message === "Authentication failed") {
+          // Don't show error, just indicate no orders available
+          setOrders([]);
+          return;
+        }
+        throw authError;
+      }
 
       if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          // Handle auth failure without triggering redirect
+          setError("Нет доступа к заказам. Попробуйте перезайти в систему.");
+          return;
+        }
         throw new Error(`Server error: ${response.status}`);
       }
 
@@ -256,11 +274,20 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedReque
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
-      const response = await authRequest(`${API_URL}/orders/${orderId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
-      });
+      let response;
+      try {
+        response = await authRequest(`${API_URL}/orders/${orderId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: newStatus }),
+        });
+      } catch (authError) {
+        if (authError instanceof Error && authError.message === "Authentication failed") {
+          alert("Ошибка аутентификации. Попробуйте обновить страницу.");
+          return;
+        }
+        throw authError;
+      }
 
       if (response.ok) {
         setOrders((prev) =>
@@ -275,10 +302,8 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedReque
         alert("Ошибка при обновлении статуса.");
       }
     } catch (err) {
-      if (err instanceof Error && err.message !== "Authentication failed") {
-        console.error("Network error:", err);
-        alert("Сетевая ошибка. Проверьте интернет.");
-      }
+      console.error("Network error:", err);
+      alert("Сетевая ошибка. Проверьте интернет.");
     }
   };
 
@@ -287,9 +312,18 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedReque
     if (!confirmed) return;
 
     try {
-      const response = await authRequest(`${API_URL}/orders/${orderId}`, {
-        method: "DELETE",
-      });
+      let response;
+      try {
+        response = await authRequest(`${API_URL}/orders/${orderId}`, {
+          method: "DELETE",
+        });
+      } catch (authError) {
+        if (authError instanceof Error && authError.message === "Authentication failed") {
+          alert("Ошибка аутентификации. Попробуйте обновить страницу.");
+          return;
+        }
+        throw authError;
+      }
 
       if (response.ok) {
         setOrders((prev) => prev.filter((o) => o.id !== orderId));
@@ -300,10 +334,8 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedReque
         alert("Ошибка при удалении заказа.");
       }
     } catch (err) {
-      if (err instanceof Error && err.message !== "Authentication failed") {
-        console.error("Network error:", err);
-        alert("Сетевая ошибка. Проверьте интернет.");
-      }
+      console.error("Network error:", err);
+      alert("Сетевая ошибка. Проверьте интернет.");
     }
   };
 
