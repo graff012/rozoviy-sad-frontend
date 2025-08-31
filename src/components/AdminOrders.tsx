@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { API_URL } from "../config";
 
 // Type for API response: has flower.name
