@@ -193,33 +193,26 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedReque
 
   const authRequest = makeAuthenticatedRequest || defaultAuthRequest;
 
+  // In AdminOrders.tsx, update the fetchOrders function to handle auth errors better:
+
   const fetchOrders = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // First try with the provided auth function, but catch auth failures
-      let response;
-      try {
-        response = await authRequest(`${API_URL}/orders`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-      } catch (authError) {
-        if (authError instanceof Error && authError.message === "Authentication failed") {
-          // Don't show error, just indicate no orders available
-          setOrders([]);
-          return;
-        }
-        throw authError;
-      }
+      const response = await authRequest(`${API_URL}/orders`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         if (response.status === 401 || response.status === 403) {
-          // Handle auth failure without triggering redirect
-          setError("Нет доступа к заказам. Попробуйте перезайти в систему.");
+          // Don't show error for auth issues, let parent component handle
+          console.log("Orders request failed with auth error:", response.status);
+          setOrders([]);
+          setError("Нет доступа к заказам. Обновите страницу или войдите заново.");
           return;
         }
         throw new Error(`Server error: ${response.status}`);
@@ -259,8 +252,10 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedReque
 
       setOrders(mappedOrders);
     } catch (err) {
-      if (err instanceof Error && err.message !== "Authentication failed") {
-        console.error("Failed to fetch orders:", err);
+      console.error("Failed to fetch orders:", err);
+      if (err instanceof Error && err.message.includes("Authentication failed")) {
+        setError("Ошибка аутентификации. Обновите страницу.");
+      } else {
         setError("Ошибка при загрузке заказов.");
       }
     } finally {
