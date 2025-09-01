@@ -476,35 +476,61 @@ export const AdminPanel = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        console.log("Admin panel access - requiring fresh login");
+        console.log("Checking admin authentication...");
+
+        // Check if user has a recent successful login
+        const hasRecentLogin = sessionStorage.getItem("adminLoginSuccess") === "true";
+
+        if (hasRecentLogin) {
+          // User recently logged in, verify their session is still valid
+          await verifyAuthentication();
+          return;
+        }
+
+        // No recent login, check if they have a valid session
+        try {
+          const response = await fetch(`${API_URL}/auth/check`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache',
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.authenticated === true) {
+              console.log("User has valid session, allowing access");
+              setIsAuthenticated(true);
+              // Store token in localStorage as fallback for iPhone
+              if (data.token) {
+                localStorage.setItem('authToken', data.token);
+              }
+              return;
+            }
+          }
+        } catch (authCheckError) {
+          console.error("Auth check failed:", authCheckError);
+        }
+
+        // No valid session found, require fresh login
+        console.log("No valid session, requiring login");
         setIsAuthenticated(false);
-
-        await fetch(`${API_URL}/auth/logout`, {
-          method: "POST",
-          credentials: "include",
-        });
-
-        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        localStorage.removeItem('authToken');
-
         navigate("/admin-login", {
           replace: true,
           state: { message: "Please login to access admin panel" },
         });
+
       } catch (error) {
-        console.error("Auth cleanup failed:", error);
+        console.error("Auth check failed:", error);
         setIsAuthenticated(false);
         navigate("/admin-login", { replace: true });
       }
     };
 
-    const hasRecentLogin = sessionStorage.getItem("adminLoginSuccess") === "true";
-
-    if (!hasRecentLogin) {
-      checkAuth();
-    } else {
-      verifyAuthentication();
-    }
+    checkAuth();
   }, [navigate]);
 
   // Load data after authentication
