@@ -65,7 +65,8 @@ export const AdminPanel = () => {
     return map[value] || value; // default to original if unknown
   };
 
-  // Enhanced authenticated request function for iPhone compatibility
+  // Replace the makeAuthenticatedRequest function in AdminPanel.tsx with this:
+
   const makeAuthenticatedRequest = async (url: string, options: RequestInit = {}) => {
     try {
       console.log(`Making request to: ${url}`, { options });
@@ -95,19 +96,90 @@ export const AdminPanel = () => {
       const response = await fetch(url, enhancedOptions);
       console.log(`Response status for ${url}:`, response.status);
 
+      // Don't automatically redirect on auth failures - let the calling component decide
       if (response.status === 401 || response.status === 403) {
-        console.log("Authentication failed during request - redirecting to login");
-        setIsAuthenticated(false);
-        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        localStorage.removeItem('authToken');
-        navigate("/admin-login", { replace: true });
-        throw new Error("Authentication failed");
+        console.log("Authentication failed during request");
+        // Only log out if this is a critical auth failure, not just orders access
+        if (url.includes('/auth/') || url.includes('/flowers') || url.includes('/categories')) {
+          setIsAuthenticated(false);
+          document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+          localStorage.removeItem('authToken');
+          navigate("/admin-login", { replace: true });
+        }
+        // Return the response instead of throwing, let caller handle it
+        return response;
       }
 
       return response;
     } catch (error) {
       console.error(`Request failed for ${url}:`, error);
       throw error;
+    }
+  };
+
+  // Also update the AdminOrders component to handle auth failures more gracefully:
+
+  // In AdminOrders.tsx, replace the fetchOrders function with this:
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await authRequest(`${API_URL}/orders`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          console.log("Orders request failed with auth error:", response.status);
+          setOrders([]);
+          setError("У вас нет доступа к заказам. Возможно, требуются дополнительные права доступа.");
+          return;
+        }
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const rawData = await response.json();
+      console.log("Raw API response:", rawData);
+
+      const apiOrders: ApiOrder[] = Array.isArray(rawData)
+        ? rawData
+        : rawData.orders || [];
+
+      const mappedOrders: OrderType[] = apiOrders.map((order) => {
+        const items = (order.items || []).map((item) => ({
+          name: item.flower?.name || "Noma'lum mahsulot",
+          quantity: item.quantity || 1,
+          price: item.price || 0,
+          total: (item.quantity || 0) * (item.price || 0),
+        }));
+
+        const total = items.reduce((sum, item) => sum + item.total, 0);
+
+        return {
+          id: order.id,
+          customer: {
+            name: order.name || "Неизвестно",
+            phone: order.phone_number || "Неизвестно",
+            address: order.address || "Адрес не указан",
+            telegram_username: order.telegram_username || "",
+          },
+          items,
+          total,
+          date: order.created_at || new Date().toISOString(),
+          status: order.status || 'pending',
+        };
+      });
+
+      setOrders(mappedOrders);
+    } catch (err) {
+      console.error("Failed to fetch orders:", err);
+      setError("Ошибка при загрузке заказов. Проверьте подключение к интернету.");
+    } finally {
+      setLoading(false);
     }
   };
 
