@@ -195,10 +195,17 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedReque
 
   // In AdminOrders.tsx, update the fetchOrders function to handle auth errors better:
 
+  // In AdminOrders.tsx, replace the fetchOrders function with this:
+
   const fetchOrders = async () => {
     try {
       setLoading(true);
       setError(null);
+
+      // Add debugging
+      console.log('Fetching orders with auth...');
+      console.log('Cookies:', document.cookie);
+      console.log('LocalStorage token:', localStorage.getItem('authToken'));
 
       const response = await authRequest(`${API_URL}/orders`, {
         method: "GET",
@@ -207,12 +214,15 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedReque
         },
       });
 
+      console.log('Orders response:', response.status, response.statusText);
+
       if (!response.ok) {
         if (response.status === 401 || response.status === 403) {
-          // Don't show error for auth issues, let parent component handle
           console.log("Orders request failed with auth error:", response.status);
+          const responseText = await response.text();
+          console.log("Auth error response:", responseText);
           setOrders([]);
-          setError("Нет доступа к заказам. Обновите страницу или войдите заново.");
+          setError("У вас нет доступа к заказам. Возможно, требуются дополнительные права доступа.");
           return;
         }
         throw new Error(`Server error: ${response.status}`);
@@ -250,14 +260,11 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedReque
         };
       });
 
+      console.log("Mapped orders:", mappedOrders);
       setOrders(mappedOrders);
     } catch (err) {
       console.error("Failed to fetch orders:", err);
-      if (err instanceof Error && err.message.includes("Authentication failed")) {
-        setError("Ошибка аутентификации. Обновите страницу.");
-      } else {
-        setError("Ошибка при загрузке заказов.");
-      }
+      setError("Ошибка при загрузке заказов. Проверьте подключение к интернету.");
     } finally {
       setLoading(false);
     }
