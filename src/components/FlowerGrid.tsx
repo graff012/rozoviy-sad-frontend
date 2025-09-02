@@ -83,8 +83,13 @@ const FlowerGrid = ({ searchTerm, selectedCategoryId }: FlowerGridProps) => {
         categoryId: flower.categoryId || flower.category_id || "",
       }));
 
-      setFlowers(formattedFlowers);
-      setFilteredFlowers(formattedFlowers);
+      // Sort by Cyrillic name (alphabet order)
+      const sortedFlowers = [...formattedFlowers].sort((a: Flower, b: Flower) =>
+        a.name.localeCompare(b.name, "ru", { sensitivity: "base" })
+      );
+
+      setFlowers(sortedFlowers);
+      setFilteredFlowers(sortedFlowers);
     } catch (err) {
       console.error("Error fetching flowers:", err);
     } finally {
@@ -133,7 +138,12 @@ const FlowerGrid = ({ searchTerm, selectedCategoryId }: FlowerGridProps) => {
       );
     });
 
-    setFilteredFlowers(result);
+    // Always keep filtered list alphabetically sorted by Cyrillic name
+    const sorted = [...result].sort((a, b) =>
+      a.name.localeCompare(b.name, "ru", { sensitivity: "base" })
+    );
+
+    setFilteredFlowers(sorted);
   }, [searchTerm, selectedCategoryId, flowers, categories]);
 
   const getCategoryName = (id: string): string => {
