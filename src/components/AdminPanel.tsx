@@ -74,30 +74,24 @@ export const AdminPanel = () => {
 
       // Add debugging
       console.log('Request headers:', options.headers);
-      console.log('Cookies:', document.cookie);
-      console.log('LocalStorage token:', localStorage.getItem('authToken'));
+      console.log('Admin token (sessionStorage):', sessionStorage.getItem('adminToken'));
+      console.log('Auth token (localStorage):', localStorage.getItem('authToken'));
+
+      // Normalize headers using Headers API to ensure consistent mutation
+      const hdrs = new Headers(options.headers as any);
+      hdrs.set('Cache-Control', 'no-cache');
+      hdrs.set('Pragma', 'no-cache');
+
+      // Prefer admin token from sessionStorage; fallback to localStorage
+      const token = sessionStorage.getItem('adminToken') || localStorage.getItem('authToken');
+      if (token && !hdrs.has('Authorization')) {
+        hdrs.set('Authorization', `Bearer ${token}`);
+      }
 
       const enhancedOptions: RequestInit = {
         ...options,
-        credentials: "include",
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache',
-          ...options.headers,
-        },
+        headers: Object.fromEntries(hdrs.entries()),
       };
-
-      // For iPhone/Safari, also try to get token from localStorage as fallback
-      const token = localStorage.getItem('authToken');
-      if (token) {
-        const headers = enhancedOptions.headers as Record<string, string>;
-        if (!headers?.['Authorization']) {
-          enhancedOptions.headers = {
-            ...enhancedOptions.headers,
-            'Authorization': `Bearer ${token}`,
-          };
-        }
-      }
 
       const response = await fetch(url, enhancedOptions);
       console.log(`Response status for ${url}:`, response.status);
@@ -131,13 +125,14 @@ export const AdminPanel = () => {
   // Authentication verification
   const verifyAuthentication = async () => {
     try {
+      const token = sessionStorage.getItem('adminToken') || localStorage.getItem('authToken');
       const response = await fetch(`${API_URL}/auth/check`, {
         method: "GET",
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       });
 
@@ -145,10 +140,6 @@ export const AdminPanel = () => {
         const data = await response.json();
         if (data.authenticated === true) {
           setIsAuthenticated(true);
-          // Store token in localStorage as fallback for iPhone
-          if (data.token) {
-            localStorage.setItem('authToken', data.token);
-          }
           sessionStorage.removeItem("adminLoginSuccess");
         } else {
           setIsAuthenticated(false);
@@ -248,13 +239,11 @@ export const AdminPanel = () => {
     try {
       await fetch(`${API_URL}/auth/logout`, {
         method: "POST",
-        credentials: "include",
       });
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
       setIsAuthenticated(false);
-      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       localStorage.removeItem('authToken');
       navigate("/", { replace: true });
     }
@@ -506,13 +495,14 @@ export const AdminPanel = () => {
 
         // No recent login, check if they have a valid session
         try {
+          const token = sessionStorage.getItem('adminToken') || localStorage.getItem('authToken');
           const response = await fetch(`${API_URL}/auth/check`, {
             method: "GET",
-            credentials: "include",
             headers: {
               "Content-Type": "application/json",
               'Cache-Control': 'no-cache',
               'Pragma': 'no-cache',
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
           });
 
@@ -521,10 +511,6 @@ export const AdminPanel = () => {
             if (data.authenticated === true) {
               console.log("User has valid session, allowing access");
               setIsAuthenticated(true);
-              // Store token in localStorage as fallback for iPhone
-              if (data.token) {
-                localStorage.setItem('authToken', data.token);
-              }
               return;
             }
           }

@@ -95,7 +95,6 @@ const FavoritesPage = () => {
       // Get all flowers with like status from the backend
       const response = await fetch(`${API_URL}/flowers`, {
         method: 'GET',
-        credentials: 'include',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

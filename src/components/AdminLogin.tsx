@@ -37,7 +37,6 @@ const AdminLogin = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify({
           phoneNumber: formData.phoneNumber, // Using camelCase to match backend DTO
           password: formData.password,

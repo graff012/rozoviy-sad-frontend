@@ -18,7 +18,7 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = sessionStorage.getItem('adminToken');
+        const token = sessionStorage.getItem('adminToken') || localStorage.getItem('authToken');
         if (token) {
           // You might want to validate the token with the server here
           setIsAuthenticated(true);
@@ -40,6 +40,8 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
       // Store the token in session storage
       sessionStorage.setItem('adminToken', token);
       sessionStorage.setItem('adminLoginSuccess', 'true');
+      // Also store in localStorage for shared API utilities
+      localStorage.setItem('authToken', token);
       
       // Set authenticated state
       setIsAuthenticated(true);
@@ -59,6 +61,7 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
       // Clear auth data from storage
       sessionStorage.removeItem('adminToken');
       sessionStorage.removeItem('adminLoginSuccess');
+      localStorage.removeItem('authToken');
       
       // Update state
       setIsAuthenticated(false);

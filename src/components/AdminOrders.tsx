@@ -177,17 +177,19 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedReque
 
   // Fallback function if no authenticated request function is provided
   const defaultAuthRequest = async (url: string, options: RequestInit = {}) => {
-    const token = localStorage.getItem('authToken');
+    // Prefer admin token from sessionStorage; fallback to localStorage
+    const token = sessionStorage.getItem('adminToken') || localStorage.getItem('authToken');
+
+    // Normalize headers to reliably set Authorization
+    const hdrs = new Headers(options.headers as any);
+    hdrs.set('Cache-Control', 'no-cache');
+    hdrs.set('Pragma', 'no-cache');
+    if (!hdrs.has('Content-Type')) hdrs.set('Content-Type', 'application/json');
+    if (token && !hdrs.has('Authorization')) hdrs.set('Authorization', `Bearer ${token}`);
+
     return fetch(url, {
       ...options,
-      credentials: "include",
-      headers: {
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache',
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
-        ...options.headers,
-      },
+      headers: Object.fromEntries(hdrs.entries()),
     });
   };
 
@@ -204,8 +206,8 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedReque
 
       // Add debugging
       console.log('Fetching orders with auth...');
-      console.log('Cookies:', document.cookie);
-      console.log('LocalStorage token:', localStorage.getItem('authToken'));
+      console.log('Admin token (sessionStorage):', sessionStorage.getItem('adminToken'));
+      console.log('Auth token (localStorage):', localStorage.getItem('authToken'));
 
       const response = await authRequest(`${API_URL}/orders`, {
         method: "GET",

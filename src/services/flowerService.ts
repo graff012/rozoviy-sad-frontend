@@ -9,10 +9,9 @@ export interface LikeResponse {
   userId: string;
 }
 
-// Create axios instance with default config
+// Create axios instance with default config (no cookies needed)
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true,
 });
 
 // Add a request interceptor to include the auth token
@@ -38,8 +37,7 @@ export const toggleLike = async (flowerId: string, userId: string): Promise<Like
     // For now, we'll use the test endpoint
     try {
       const testResponse = await axios.get<LikeResponse>(
-        `${API_URL}/flowers/test-like/${flowerId}/${userId}`,
-        { withCredentials: true }
+        `${API_URL}/flowers/test-like/${flowerId}/${userId}`
       );
       return testResponse.data;
     } catch (testError) {
