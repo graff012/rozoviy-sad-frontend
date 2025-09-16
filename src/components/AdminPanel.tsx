@@ -21,6 +21,7 @@ type Flower = {
   imgUrl?: string;
   categoryId: string;
   price: string;
+  stock: number;
 };
 
 export const AdminPanel = () => {
@@ -34,6 +35,7 @@ export const AdminPanel = () => {
     imageFile: null,
     categoryId: "",
     price: "",
+    stock: 0,
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [flowers, setFlowers] = useState<Flower[]>([]);
@@ -252,7 +254,12 @@ export const AdminPanel = () => {
   // Handle form changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === 'stock') {
+      const parsed = value === '' ? 0 : Math.max(0, Math.floor(Number(value)));
+      setFormData((prev) => ({ ...prev, stock: isNaN(parsed) ? 0 : parsed }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -286,6 +293,7 @@ export const AdminPanel = () => {
         formDataToSend.append("height", formData.height || "");
         formDataToSend.append("categoryId", formData.categoryId);
         formDataToSend.append("price", formData.price);
+        formDataToSend.append("stock", String(formData.stock));
 
         if (formData.imageFile) {
           formDataToSend.append("image", formData.imageFile);
@@ -312,6 +320,7 @@ export const AdminPanel = () => {
             imageFile: null,
             categoryId: categories.length > 0 ? categories[0].id : "",
             price: "",
+            stock: 0,
           });
           const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
           if (fileInput) {
@@ -355,10 +364,11 @@ export const AdminPanel = () => {
     const formDataToSend = new FormData();
     formDataToSend.append("name", formData.name);
     formDataToSend.append("price", formData.price);
-    formDataToSend.append("category_id", formData.categoryId);
+    formDataToSend.append("categoryId", formData.categoryId);
     formDataToSend.append("smell", formData.smell);
     formDataToSend.append("height", formData.height);
     formDataToSend.append("flowerSize", formData.flowerSize);
+    formDataToSend.append("stock", String(formData.stock));
     if (formData.imageFile) {
       formDataToSend.append("image", formData.imageFile);
     }
@@ -380,6 +390,7 @@ export const AdminPanel = () => {
         imageFile: null,
         categoryId: categories.length > 0 ? categories[0].id : "",
         price: "",
+        stock: 0,
       });
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
       if (fileInput) {
@@ -403,6 +414,7 @@ export const AdminPanel = () => {
       imageFile: null,
       categoryId: flower.categoryId,
       price: flower.price,
+      stock: flower.stock ?? 0,
     });
     setEditingId(flower.id);
   };
@@ -418,6 +430,7 @@ export const AdminPanel = () => {
       imageFile: null,
       categoryId: categories.length > 0 ? categories[0].id : "",
       price: "",
+      stock: 0,
     });
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     if (fileInput) {
@@ -729,6 +742,22 @@ export const AdminPanel = () => {
                       required
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">
+                      Qoldiq (soni) *
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      name="stock"
+                      value={formData.stock}
+                      onChange={handleChange}
+                      placeholder="0"
+                      className="w-full border border-[#e7d6e0] rounded py-2 px-3 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#f2b5d4]"
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
@@ -799,6 +828,12 @@ export const AdminPanel = () => {
                           <div className="text-sm text-black mb-2">
                             <strong>Высота:</strong> {flower.height || "–"}
                           </div>
+                          <div className="text-sm text-black mb-2">
+                            <strong>Qoldiq:</strong> {typeof (flower as any).stock === 'number' ? flower.stock : 0}
+                            {((flower as any).stock ?? 0) === 0 && (
+                              <span className="ml-2 text-xs text-red-600">(Sotuvda yo'q)</span>
+                            )}
+                          </div>
                           <div className="flex gap-x-2">
                             <button
                               onClick={() => handleEditClick(flower)}
@@ -852,6 +887,14 @@ export const AdminPanel = () => {
                             <div className="text-sm text-gray-600">{getSmellDisplayText(flower.smell)}</div>
                           </div>
                           <div className="w-1/4 text-black">{flower.height || "–"}</div>
+                          <div className="w-1/4 text-black">
+                            <div>
+                              Qoldiq: {typeof (flower as any).stock === 'number' ? flower.stock : 0}
+                              {((flower as any).stock ?? 0) === 0 && (
+                                <span className="ml-2 text-xs text-red-600">(Sotuvda yo'q)</span>
+                              )}
+                            </div>
+                          </div>
                           <div className="w-1/4 flex gap-x-2">
                             <button
                               onClick={() => handleEditClick(flower)}
