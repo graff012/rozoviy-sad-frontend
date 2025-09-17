@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoFlowerOutline } from "react-icons/io5";
 import { BiCategory } from "react-icons/bi";
@@ -412,6 +412,8 @@ export const AdminPanel = () => {
     }
   };
 
+  const formRef = useRef<HTMLDivElement>(null)
+
   // Handle edit click
   const handleEditClick = (flower: Flower) => {
     setFormData({
@@ -425,6 +427,13 @@ export const AdminPanel = () => {
       stock: flower.stock ?? 0,
     });
     setEditingId(flower.id);
+
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    }, 100)
   };
 
   // Handle cancel edit
@@ -630,9 +639,13 @@ export const AdminPanel = () => {
               )}
 
               {/* Add/Edit Form */}
-              <div className="bg-white p-5 sm:p-6 rounded-lg shadow border border-[#f0e5ef]">
+              <div
+                ref={formRef}
+                className={`bg-white p-5 sm:p-6 rounded-lg shadow border transition-colors duration-300 ${editingId ? 'border-blue-300 bg-blue-50' : 'border-[#f0e5ef]'
+                  }`}
+              >
                 <h3 className="text-lg font-semibold mb-4 text-black">
-                  {editingId ? "Gulni tahrirlash" : "Yangi gul qo'shish"}
+                  {editingId ? "🔄 Редактировать цветок" : "➕ Добавить новый цветок"}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
                   <div>
