@@ -398,7 +398,7 @@ export const AdminPanel = () => {
         imageFile: null,
         categoryId: categories.length > 0 ? categories[0].id : "",
         price: "",
-        stock: 0,
+        stock: "",
       });
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
       if (fileInput) {
@@ -438,7 +438,7 @@ export const AdminPanel = () => {
       imageFile: null,
       categoryId: categories.length > 0 ? categories[0].id : "",
       price: "",
-      stock: 0,
+      stock: "",
     });
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     if (fileInput) {
