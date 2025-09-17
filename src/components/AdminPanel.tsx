@@ -21,7 +21,7 @@ type Flower = {
   imgUrl?: string;
   categoryId: string;
   price: string;
-  stock: number;
+  stock: string;
 };
 
 export const AdminPanel = () => {
@@ -35,7 +35,7 @@ export const AdminPanel = () => {
     imageFile: null,
     categoryId: "",
     price: "",
-    stock: 0,
+    stock: "",
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [flowers, setFlowers] = useState<Flower[]>([]);
@@ -255,8 +255,8 @@ export const AdminPanel = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     if (name === 'stock') {
-      const parsed = value === '' ? 0 : Math.max(0, Math.floor(Number(value)));
-      setFormData((prev) => ({ ...prev, stock: isNaN(parsed) ? 0 : parsed }));
+      // Allow empty string, convert to number only when saving
+      setFormData((prev) => ({ ...prev, stock: value }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -270,13 +270,20 @@ export const AdminPanel = () => {
   // Handle save/create flower
   const handleSave = async () => {
     if (!formData.name.trim() || !formData.price || !formData.categoryId) {
-      alert("Iltimos, barcha majburiy maydonlarni to'ldiring (Nomi, Narxi, Kategoriya)");
+      alert("Пожалуйста, заполните все обязательные поля (Название, Цена, Категория)");
       return;
     }
 
     const priceValue = parseFloat(formData.price);
     if (isNaN(priceValue) || priceValue <= 0) {
-      alert("Iltimos, 0 dan katta bo'lgan to'g'ri narxni kiriting");
+      alert("Пожалуйста, введите правильную цену больше 0");
+      return;
+    }
+
+    // Convert stock to number, default to 0 if empty
+    const stockValue = formData.stock === "" ? 0 : parseInt(formData.stock);
+    if (isNaN(stockValue) || stockValue < 0) {
+      alert("Пожалуйста, введите правильное количество (0 или больше)");
       return;
     }
 
@@ -320,7 +327,7 @@ export const AdminPanel = () => {
             imageFile: null,
             categoryId: categories.length > 0 ? categories[0].id : "",
             price: "",
-            stock: 0,
+            stock: "",
           });
           const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
           if (fileInput) {
@@ -630,7 +637,7 @@ export const AdminPanel = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">
-                      Nomi *
+                      Имя *
                     </label>
                     <input
                       type="text"
@@ -692,7 +699,7 @@ export const AdminPanel = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">
-                      Gul rasmi
+                      Изображение цветка
                     </label>
                     <input
                       type="file"
@@ -729,7 +736,7 @@ export const AdminPanel = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">
-                      Narxi *
+                      Стоимость *
                     </label>
                     <input
                       type="number"
@@ -745,7 +752,7 @@ export const AdminPanel = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">
-                      Qoldiq (soni) *
+                      Количество *
                     </label>
                     <input
                       type="number"
@@ -754,7 +761,7 @@ export const AdminPanel = () => {
                       name="stock"
                       value={formData.stock}
                       onChange={handleChange}
-                      placeholder="0"
+                      placeholder="Введите количество"
                       className="w-full border border-[#e7d6e0] rounded py-2 px-3 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#f2b5d4]"
                       required
                     />
@@ -782,7 +789,7 @@ export const AdminPanel = () => {
                       onClick={handleCancelEdit}
                       className="bg-gray-200 hover:bg-gray-300 text-black font-semibold py-2 px-6 rounded shadow transition text-center"
                     >
-                      Bekor qilish
+                      Отменить
                     </button>
                   )}
                 </div>
@@ -830,7 +837,7 @@ export const AdminPanel = () => {
                             <strong>Высота:</strong> {flower.height || "–"}
                           </div>
                           <div className="text-sm text-black mb-2">
-                            <strong>Qoldiq:</strong> {typeof (flower as any).stock === 'number' ? flower.stock : 0}
+                            <strong>Количество:</strong> {typeof (flower as any).stock === 'number' ? flower.stock : 0}
                             {((flower as any).stock ?? 0) === 0 && (
                               <span className="ml-2 text-xs text-red-600">(Sotuvda yo'q)</span>
                             )}
@@ -890,7 +897,7 @@ export const AdminPanel = () => {
                           <div className="w-1/4 text-black">{flower.height || "–"}</div>
                           <div className="w-1/4 text-black">
                             <div>
-                              Qoldiq: {typeof (flower as any).stock === 'number' ? flower.stock : 0}
+                              Количество: {typeof (flower as any).stock === 'number' ? flower.stock : 0}
                               {((flower as any).stock ?? 0) === 0 && (
                                 <span className="ml-2 text-xs text-red-600">(Sotuvda yo'q)</span>
                               )}
@@ -901,7 +908,7 @@ export const AdminPanel = () => {
                               onClick={() => handleEditClick(flower)}
                               className="text-sm bg-[#fdf6f9] hover:bg-[#ffe3f0] text-black px-3 py-1 rounded transition"
                             >
-                              Tahrirlash
+                              Редактировать
                             </button>
                             <button
                               onClick={() => handleDelete(flower.id)}
@@ -943,13 +950,13 @@ export const AdminPanel = () => {
                     onClick={cancelDelete}
                     className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-1.5 px-4 rounded transition text-sm"
                   >
-                    Bekor qilish
+                    Отмена
                   </button>
                   <button
                     onClick={confirmDelete}
                     className="bg-red-500 hover:bg-red-600 text-white font-medium py-1.5 px-4 rounded transition text-sm"
                   >
-                    O'chirish
+                    Удалить
                   </button>
                 </div>
               </div>
