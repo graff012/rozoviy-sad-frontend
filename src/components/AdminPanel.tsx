@@ -927,7 +927,7 @@ export const AdminPanel = () => {
                               onClick={() => handleDelete(flower.id)}
                               className="text-sm bg-[#ffeef0] hover:bg-red-200 text-[#e57373] px-3 py-1 rounded transition"
                             >
-                              O'chirish
+                              Удалить
                             </button>
                           </div>
                         </div>
