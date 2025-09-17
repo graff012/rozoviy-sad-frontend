@@ -13,6 +13,7 @@ interface Flower {
   categoryId: string;
   price: string;
   isLiked?: boolean;
+  stock?: number;
 }
 
 interface Category {
@@ -81,6 +82,7 @@ const FlowerGrid = ({ searchTerm, selectedCategoryId }: FlowerGridProps) => {
         imgUrl: flower.imgUrl || flower.img_url || null,
         flowerSize: flower.flowerSize || flower.flower_size || "",
         categoryId: flower.categoryId || flower.category_id || "",
+        stock: typeof flower.stock === 'number' ? flower.stock : Number(flower.stock) || 0,
       }));
 
       // Sort by Cyrillic name (alphabet order)
@@ -242,6 +244,10 @@ const FlowerGrid = ({ searchTerm, selectedCategoryId }: FlowerGridProps) => {
                       <span className="font-medium">Высота:</span>{" "}
                       {flower.height}
                     </div>
+                    <div>
+                      <span className="font-medium">Количество:</span>{" "}
+                      {typeof flower.stock === 'number' ? flower.stock : 0} шт.
+                    </div>
                   </div>
                   <div className="mb-4">
                     <p className="text-2xl font-bold text-pink-600">
@@ -252,31 +258,37 @@ const FlowerGrid = ({ searchTerm, selectedCategoryId }: FlowerGridProps) => {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      addToCart({
-                        id: flower.id,
-                        name: flower.name,
-                        price: flower.price,
-                        imgUrl: flower.imgUrl as string,
-                      });
-                      setAddedToCart((prev) => ({
-                        ...prev,
-                        [flower.id]: true,
-                      }));
+                      if ((flower.stock ?? 0) > 0) {
+                        addToCart({
+                          id: flower.id,
+                          name: flower.name,
+                          price: flower.price,
+                          imgUrl: flower.imgUrl as string,
+                        });
+                        setAddedToCart((prev) => ({
+                          ...prev,
+                          [flower.id]: true,
+                        }));
+                      }
                     }}
                     disabled={
+                      (flower.stock ?? 0) === 0 ||
                       addedToCart[flower.id] ||
                       cartItems.some((item) => item.id === flower.id)
                     }
-                    className={`w-full font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg ${addedToCart[flower.id] ||
-                      cartItems.some((item) => item.id === flower.id)
-                      ? "bg-green-600 hover:bg-green-700"
-                      : "bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800"
+                    className={`w-full font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg ${
+                      (flower.stock ?? 0) === 0
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : addedToCart[flower.id] || cartItems.some((item) => item.id === flower.id)
+                        ? "bg-green-600 hover:bg-green-700"
+                        : "bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800"
                       } text-white`}
                   >
-                    {addedToCart[flower.id] ||
-                      cartItems.some((item) => item.id === flower.id)
-                      ? "Savatga qo'shildi"
-                      : "Savatga qo'shish"}
+                    {(flower.stock ?? 0) === 0
+                      ? "Нет в наличии"
+                      : addedToCart[flower.id] || cartItems.some((item) => item.id === flower.id)
+                      ? "Добавлено в корзину"
+                      : "В корзину"}
                   </button>
                 </div>
               </Link>

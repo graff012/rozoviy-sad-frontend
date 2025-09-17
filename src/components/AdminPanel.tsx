@@ -380,7 +380,8 @@ export const AdminPanel = () => {
 
     if (res.ok) {
       const updated = await res.json();
-      setFlowers(flowers.map((f) => (f.id === editingId ? updated : f)));
+      const updatedFlower = updated?.flower ?? updated; // fallback if backend returns bare flower
+      setFlowers(flowers.map((f) => (f.id === editingId ? updatedFlower : f)));
       setEditingId(null);
       setFormData({
         name: "",
