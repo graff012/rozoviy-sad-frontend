@@ -276,19 +276,18 @@ const FlowerGrid = ({ searchTerm, selectedCategoryId }: FlowerGridProps) => {
                       addedToCart[flower.id] ||
                       cartItems.some((item) => item.id === flower.id)
                     }
-                    className={`w-full font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg ${
-                      (flower.stock ?? 0) === 0
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : addedToCart[flower.id] || cartItems.some((item) => item.id === flower.id)
-                        ? "bg-green-600 hover:bg-green-700"
+                    className={`w-full font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg ${(flower.stock ?? 0) === 0
+                      ? "bg-green-600 cursor-not-allowed"
+                      : addedToCart[flower.id] || cartItems.some((item) => item.id === flower.id)
+                        ? "bg-red-500 hover:bg-red-700"
                         : "bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800"
                       } text-white`}
                   >
                     {(flower.stock ?? 0) === 0
                       ? "Нет в наличии"
                       : addedToCart[flower.id] || cartItems.some((item) => item.id === flower.id)
-                      ? "Добавлено в корзину"
-                      : "В корзину"}
+                        ? "Добавлено в корзину"
+                        : "В корзину"}
                   </button>
                 </div>
               </Link>
