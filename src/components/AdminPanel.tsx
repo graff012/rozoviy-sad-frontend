@@ -594,9 +594,9 @@ export const AdminPanel = () => {
 
   return (
     <section className="min-h-screen flex items-center justify-center bg-[#f8f6fa] py-10 px-4 sm:px-6">
-      <div className="flex rounded-xl shadow-lg bg-[#fff4f7] w-full max-w-[1000px] flex-col lg:flex-row">
+      <div className="flex rounded-xl shadow-lg bg-[#fff4f7] w-full max-w-[1400px] flex-col lg:flex-row">
         {/* Sidebar */}
-        <aside className="w-full lg:w-1/3 min-w-[200px] bg-[#fdf6f9] rounded-t-xl lg:rounded-l-xl lg:rounded-tr-none p-6 sm:p-8 border-b lg:border-b-0 lg:border-r border-[#f0e5ef]">
+        <aside className="w-full lg:w-1/4 min-w-[200px] bg-[#fdf6f9] rounded-t-xl lg:rounded-l-xl lg:rounded-tr-none p-6 sm:p-8 border-b lg:border-b-0 lg:border-r border-[#f0e5ef]">
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-2xl font-bold font-[Chillax] text-black">Admin Panel</h1>
             <button
