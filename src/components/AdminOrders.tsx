@@ -16,7 +16,7 @@ interface ApiOrder {
   phone_number: string;
   address: string;
   telegram_username: string;
-  status: 'pending' | 'processing' | 'completed' | 'cancelled';
+  status: 'pending' | 'paid' | 'cancelled';
   created_at: string;
   items: ApiOrderItem[];
 }
@@ -40,7 +40,7 @@ interface OrderType {
   items: OrderItem[];
   total: number;
   date: string;
-  status: 'pending' | 'processing' | 'completed' | 'cancelled';
+  status: 'pending' | 'paid' | 'cancelled';
 }
 
 interface OrderItemProps {
@@ -86,18 +86,16 @@ const OrderItem = ({ order, onStatusChange, onDelete }: OrderItemProps) => {
           <select
             value={order.status}
             onChange={(e) => onStatusChange(order.id, e.target.value)}
-            className={`text-xs px-2 py-1 rounded-full font-medium ${order.status === 'completed'
-              ? 'bg-green-100 text-green-800'
-              : order.status === 'processing'
-                ? 'bg-yellow-100 text-yellow-800'
+            className={`text-xs px-2 py-1 rounded-full font-medium ${
+              order.status === 'paid'
+                ? 'bg-green-100 text-green-800'
                 : order.status === 'cancelled'
-                  ? 'bg-red-100 text-red-800'
-                  : 'bg-blue-100 text-blue-800'
-              }`}
+                ? 'bg-red-100 text-red-800'
+                : 'bg-blue-100 text-blue-800'
+            }`}
           >
             <option value="pending">В ожидании</option>
-            <option value="processing">В обработке</option>
-            <option value="completed">Завершён</option>
+            <option value="paid">Оплачен</option>
             <option value="cancelled">Отменён</option>
           </select>
         </div>
@@ -135,18 +133,16 @@ const OrderItem = ({ order, onStatusChange, onDelete }: OrderItemProps) => {
           <select
             value={order.status}
             onChange={(e) => onStatusChange(order.id, e.target.value)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium min-w-[120px] ${order.status === 'completed'
-              ? 'bg-green-100 text-green-800'
-              : order.status === 'processing'
-                ? 'bg-yellow-100 text-yellow-800'
+            className={`px-3 py-1.5 rounded-full text-xs font-medium min-w-[120px] ${
+              order.status === 'paid'
+                ? 'bg-green-100 text-green-800'
                 : order.status === 'cancelled'
-                  ? 'bg-red-100 text-red-800'
-                  : 'bg-blue-100 text-blue-800'
-              }`}
+                ? 'bg-red-100 text-red-800'
+                : 'bg-blue-100 text-blue-800'
+            }`}
           >
             <option value="pending">В ожидании</option>
-            <option value="processing">В обработке</option>
-            <option value="completed">Завершён</option>
+            <option value="paid">Оплачен</option>
             <option value="cancelled">Отменён</option>
           </select>
         </div>

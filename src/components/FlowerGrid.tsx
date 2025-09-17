@@ -277,10 +277,10 @@ const FlowerGrid = ({ searchTerm, selectedCategoryId }: FlowerGridProps) => {
                       cartItems.some((item) => item.id === flower.id)
                     }
                     className={`w-full font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg ${(flower.stock ?? 0) === 0
-                      ? "bg-green-600 cursor-not-allowed"
+                      ? "bg-gray-400 cursor-not-allowed"
                       : addedToCart[flower.id] || cartItems.some((item) => item.id === flower.id)
-                        ? "bg-red-500 hover:bg-red-700"
-                        : "bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800"
+                        ? "bg-red-600 hover:bg-red-700"
+                        : "bg-green-500 to-green-600 "
                       } text-white`}
                   >
                     {(flower.stock ?? 0) === 0
