@@ -166,7 +166,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
   return (
     <header className="sticky top-0 bg-[#004F44] z-50 shadow-lg">
       {/* Main header bar */}
-      <div className="pt-1 pb-1 md:pt-2 md:pb-2">
+      <div className="pt-2 pb-2 md:pt-2 md:pb-2">
         <div className="mycon">
           {/* Desktop layout */}
           <div className="hidden md:flex justify-between items-center">
