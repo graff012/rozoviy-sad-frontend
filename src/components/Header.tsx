@@ -169,20 +169,20 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
       <div className="pt-2 pb-2 md:pt-2 md:pb-2">
         <div className="mycon">
           {/* Desktop layout */}
-          <div className="hidden md:flex justify-between items-center">
-            <Link to={"/"}>
-              <img src="./incspace-ten.svg" alt="logo" />
+          <div className="hidden md:flex justify-between items-center gap-x-8">
+            <Link to={"/"} className="flex-shrink-0">
+              <img src="./incspace-ten.svg" alt="logo" className="h-12 w-auto" />
             </Link>
 
-            <div className="flex gap-x-4 items-center">
-              {/* Desktop Search */}
-              <div className="flex flex-col relative">
-                <div className="flex justify-between gap-2 items-center border border-white rounded-lg px-4 py-2 bg-[#004F44] h-12">
+            {/* Desktop Search - Separated for better spacing */}
+            <div className="flex-1 flex justify-center px-4 max-w-3xl">
+              <div className="flex flex-col relative w-full">
+                <div className="flex justify-between gap-2 items-center border border-white rounded-lg px-4 py-2 bg-[#004F44] h-12 w-full">
                   <IoSearchSharp className="text-2xl text-white flex-shrink-0" />
                   <input
                     type="search"
                     placeholder="Qidirish..."
-                    className="text-xl border-none w-[300px] appearance-none focus:outline-none text-white bg-transparent h-full px-2"
+                    className="text-xl border-none flex-1 appearance-none focus:outline-none text-white bg-transparent h-full px-2"
                     value={inputValue}
                     onChange={handleInputChange}
                     onFocus={handleSearchFocus}
@@ -214,8 +214,10 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
                   </div>
                 )}
               </div>
+            </div>
 
-              {/* Desktop Navigation Icons */}
+            {/* Desktop Navigation Icons */}
+            <div className="flex gap-x-4 items-center flex-shrink-0">
               <Link
                 to="/cart"
                 className="p-3 border border-white rounded-lg relative hover:cursor-pointer hover:bg-[#00695C] transition-all group"
