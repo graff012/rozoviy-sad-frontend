@@ -171,7 +171,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
           {/* Desktop layout */}
           <div className="hidden md:flex justify-between items-center gap-x-8">
             <Link to={"/"} className="flex-shrink-0">
-              <img src="./incspace-ten.svg" alt="logo" className="h-12 w-auto" />
+              <img src="./incspace-ten.svg" alt="logo" className="h-20 w-auto" />
             </Link>
 
             {/* Desktop Search - Separated for better spacing */}

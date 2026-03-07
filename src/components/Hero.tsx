@@ -107,74 +107,75 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Desktop Layout - Original side by side */}
-        <div className="hidden md:flex justify-between">
-          <div className="flex flex-col items-center">
-            <div className="w-[580px]">
-              <h1 className="hero-title w-[540px] text-[64px] text-left text-white font-semibold">
-                Vodiy Turfa Gullari MCHJ
-              </h1>
-              <p className="hero-p max-w-[420px] text-base text-white mt-8 leading-8">
-                Biz yashaydigan va ishlaydigan olam — qalbimizdagi munosabat va
-                umidlarning go'zal aksidir.
-              </p>
-              <div className="flex items-center justify-between w-[400px] mt-5">
-                {/* Shop now button goes to flowers */}
-                <button
-                  onClick={goToFlowers}
-                  className="px-4 bg-white py-3 rounded-lg text-lg hover:-translate-y-0.5 hover:cursor-pointer transition-transform duration-200"
-                >
-                  Xarid qilish
-                </button>
-                {/* Explore plants button goes to flowers */}
-                <div
-                  onClick={goToFlowers}
-                  className="flex items-center gap-x-3 bg-white px-4 py-3 rounded-lg text-lg hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200"
-                >
-                  <button className="hover:cursor-pointer">
-                    Gullarni ko'rish
-                  </button>
-                  <FaArrowRightLong />
-                </div>
+        {/* Desktop Layout - Improved responsiveness */}
+        <div className="hidden md:flex justify-between items-center gap-12">
+          {/* Hero Text Section */}
+          <div className="flex-1 max-w-[540px]">
+            <h1 className="hero-title text-5xl lg:text-6xl xl:text-7xl text-white font-semibold leading-tight">
+              Vodiy Turfa Gullari MCHJ
+            </h1>
+            <p className="hero-p text-lg text-white mt-8 leading-relaxed max-w-[420px]">
+              Biz yashaydigan va ishlaydigan olam — qalbimizdagi munosabat va
+              umidlarning go'zal aksidir.
+            </p>
+            <div className="flex items-center gap-6 mt-10">
+              <button
+                onClick={goToFlowers}
+                className="px-8 bg-white py-3 rounded-lg text-lg hover:-translate-y-0.5 hover:cursor-pointer transition-transform duration-200 font-medium"
+              >
+                Xarid qilish
+              </button>
+              <div
+                onClick={goToFlowers}
+                className="flex items-center gap-x-3 bg-white px-8 py-3 rounded-lg text-lg hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200 font-medium"
+              >
+                <span>Gullarni ko'rish</span>
+                <FaArrowRightLong />
               </div>
             </div>
           </div>
 
-          <div className="images flex">
-            <div className="flex flex-col">
-              <div className="imgOne w-[220px] h-[260px] m-1 relative overflow-hidden rounded-lg">
+          {/* Hero Images Section */}
+          <div className="flex items-start gap-4 flex-shrink-0">
+            {/* Small Images Column */}
+            <div className="flex flex-col gap-4">
+              <div className="imgOne w-[180px] lg:w-[220px] h-[240px] lg:h-[260px] relative overflow-hidden rounded-xl">
                 <button
                   onClick={goToFlowers}
-                  className="absolute top-2 left-2 px-4 py-1 text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 rounded transition-transform duration-200"
+                  className="absolute top-3 left-3 px-4 py-1.5 text-sm text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 rounded-lg transition-transform duration-200"
                 >
                   Yangilar
                 </button>
               </div>
-              <div className="imgTwo w-[220px] h-[270px] m-1 relative overflow-hidden rounded-lg">
+              <div className="imgTwo w-[180px] lg:w-[220px] h-[250px] lg:h-[270px] relative overflow-hidden rounded-xl">
                 <button
                   onClick={goToFlowers}
-                  className="absolute top-2 left-2 px-4 py-1 text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 rounded transition-transform duration-200"
+                  className="absolute top-3 left-3 px-4 py-1.5 text-sm text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 rounded-lg transition-transform duration-200"
                 >
                   Mashhurlar
                 </button>
               </div>
             </div>
-            <div className="imgThree w-[380px] h-[540px] m-1 flex flex-col justify-between rounded-lg overflow-hidden p-4">
+
+            {/* Featured Image - imgThree */}
+            <div className="imgThree w-[300px] lg:w-[380px] h-[506px] lg:h-[546px] flex flex-col justify-between rounded-xl overflow-hidden p-6">
               <button
                 onClick={goToFlowers}
-                className="px-4 py-1 text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 w-fit rounded transition-transform duration-200"
+                className="px-4 py-1.5 text-sm text-white hover:cursor-pointer hover:-translate-y-0.5 bg-blue-700 w-fit rounded-lg transition-transform duration-200"
               >
                 Xususiyatlari
               </button>
               <div className="text-center space-y-4">
-                <h2 className="text-2xl text-white">Mavsumiy gullar</h2>
-                <p className="font-[Steppe] text-[14px] max-w-[320px] text-center text-white leading-6">
+                <h2 className="text-2xl lg:text-3xl text-white font-semibold">
+                  Mavsumiy gullar
+                </h2>
+                <p className="font-[Steppe] text-sm text-white leading-relaxed max-w-[280px] mx-auto">
                   Inson gullari — fasl va ob-havo qanday bo'lishidan qat'i
                   nazar, har doim yashnab o'sadigan o'simlik kabidir.
                 </p>
                 <button
                   onClick={goToFlowers}
-                  className="py-3 bg-white text-center w-full hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200 rounded font-medium"
+                  className="py-3 bg-white text-black w-full hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200 rounded-lg font-medium"
                 >
                   Ko'proq bilish
                 </button>
