@@ -169,20 +169,20 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
       <div className="pt-2 pb-2 md:pt-2 md:pb-2">
         <div className="mycon">
           {/* Desktop layout */}
-          <div className="hidden md:flex justify-between items-center gap-x-8">
+          <div className="hidden md:flex justify-between items-center gap-x-4">
             <Link to={"/"} className="flex-shrink-0">
               <img src="./incspace-ten.svg" alt="logo" className="h-20 w-auto" />
             </Link>
 
             {/* Desktop Search - Separated for better spacing */}
-            <div className="flex-1 flex justify-center px-4 max-w-3xl">
+            <div className="flex-1 flex justify-center px-2 lg:px-4 max-w-3xl min-w-0">
               <div className="flex flex-col relative w-full">
                 <div className="flex justify-between gap-2 items-center border border-white rounded-lg px-4 py-2 bg-[#004F44] h-12 w-full">
                   <IoSearchSharp className="text-2xl text-white flex-shrink-0" />
                   <input
                     type="search"
                     placeholder="Qidirish..."
-                    className="text-xl border-none flex-1 appearance-none focus:outline-none text-white bg-transparent h-full px-2"
+                    className="text-lg lg:text-xl border-none flex-1 appearance-none focus:outline-none text-white bg-transparent h-full px-2 min-w-0"
                     value={inputValue}
                     onChange={handleInputChange}
                     onFocus={handleSearchFocus}
@@ -190,7 +190,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
                     autoComplete="off"
                   />
                   <button
-                    className="px-4 py-1 bg-white text-[#004F44] rounded hover:bg-gray-200 transition-colors font-medium flex-shrink-0"
+                    className="px-3 lg:px-4 py-1 bg-white text-[#004F44] rounded hover:bg-gray-200 transition-colors font-medium flex-shrink-0 text-sm lg:text-base"
                     onClick={handleSearch}
                     aria-label="Qidirish"
                   >
@@ -217,10 +217,10 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
             </div>
 
             {/* Desktop Navigation Icons */}
-            <div className="flex gap-x-4 items-center flex-shrink-0">
+            <div className="flex gap-x-2 lg:gap-x-4 items-center flex-shrink-0">
               <Link
                 to="/cart"
-                className="p-3 border border-white rounded-lg relative hover:cursor-pointer hover:bg-[#00695C] transition-all group"
+                className="p-2 lg:p-3 border border-white rounded-lg relative hover:cursor-pointer hover:bg-[#00695C] transition-all group"
                 title="Savat"
               >
                 <FaCartShopping className="text-white group-hover:scale-110 transition-transform" />
@@ -233,7 +233,7 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
 
               <Link
                 to="/admin"
-                className="p-3 border border-white rounded-lg hover:cursor-pointer hover:bg-[#00695C] transition-all group"
+                className="p-2 lg:p-3 border border-white rounded-lg hover:cursor-pointer hover:bg-[#00695C] transition-all group"
                 title="Admin Panel"
               >
                 <FaUserShield className="text-white group-hover:scale-110 transition-transform text-lg" />
@@ -242,13 +242,12 @@ const Header = ({ searchTerm, setSearchTerm }: HeaderProps) => {
               <div className="relative" ref={contactsRef}>
                 <button
                   onClick={toggleContacts}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/30 rounded-lg text-white font-medium transition-colors group"
+                  className="flex items-center gap-2 px-3 lg:px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/30 rounded-lg text-white font-medium transition-colors group whitespace-nowrap"
                   aria-expanded={showContacts}
                   aria-haspopup="true"
                 >
                   <FaPhone className="group-hover:scale-110 transition-transform" />
-                  <span className="hidden lg:inline">Aloqa</span>
-                  <span className="lg:hidden">Aloqa</span>
+                  <span className="inline">Aloqa</span>
                 </button>
 
                 {showContacts && (

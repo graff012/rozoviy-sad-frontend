@@ -115,8 +115,7 @@ const Hero = () => {
               Vodiy Turfa Gullari MCHJ
             </h1>
             <p className="hero-p text-lg text-white mt-8 leading-relaxed max-w-[420px]">
-              Biz yashaydigan va ishlaydigan olam — qalbimizdagi munosabat va
-              umidlarning go'zal aksidir.
+              Gullar – quvonch, sevgi va e'tibor tilidir.             
             </p>
             <div className="flex items-center gap-6 mt-10">
               <button
