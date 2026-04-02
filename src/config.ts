@@ -3,7 +3,7 @@
 const ENV_API_URL = (import.meta.env.VITE_API_URL as string | undefined);
 export const API_URL: string = (ENV_API_URL && ENV_API_URL.length > 0)
   ? ENV_API_URL
-  : `${window.location.origin}/api`;
+  : `https://rozoviy-sad-production.up.railway.app/api`;
 
 // Base site origin (without /api). Compute defensively to avoid calling .replace on undefined
 export const BASE_URL: string = (() => {

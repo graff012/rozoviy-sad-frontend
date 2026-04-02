@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { API_URL } from '../config';
 
 export interface LikeResponse {
@@ -9,37 +8,48 @@ export interface LikeResponse {
   userId: string;
 }
 
-// Create axios instance with default config (no cookies needed)
-const api = axios.create({
-  baseURL: API_URL,
-});
+const getAuthHeaders = (includeJsonContentType = false): HeadersInit => {
+  const headers: Record<string, string> = {};
 
-// Add a request interceptor to include the auth token
-api.interceptors.request.use((config) => {
+  if (includeJsonContentType) {
+    headers['Content-Type'] = 'application/json';
+  }
+
   const token = localStorage.getItem('token');
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    headers.Authorization = `Bearer ${token}`;
   }
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-});
+
+  return headers;
+};
+
+const fetchJson = async <T>(url: string, init?: RequestInit): Promise<T> => {
+  const response = await fetch(url, init);
+
+  if (!response.ok) {
+    throw new Error(`Request failed with status ${response.status}`);
+  }
+
+  return response.json() as Promise<T>;
+};
 
 export const toggleLike = async (flowerId: string, userId: string): Promise<LikeResponse> => {
   try {
-    const response = await api.post<LikeResponse>(
-      `/flowers/${flowerId}/like`,
-      { userId }
-    );
-    return response.data;
+    return await fetchJson<LikeResponse>(`${API_URL}/flowers/${flowerId}/like`, {
+      method: 'POST',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify({ userId }),
+    });
   } catch (error) {
     console.error('Error toggling like:', error);
     // For now, we'll use the test endpoint
     try {
-      const testResponse = await axios.get<LikeResponse>(
-        `${API_URL}/flowers/test-like/${flowerId}/${userId}`
+      return await fetchJson<LikeResponse>(
+        `${API_URL}/flowers/test-like/${flowerId}/${userId}`,
+        {
+          headers: getAuthHeaders(),
+        }
       );
-      return testResponse.data;
     } catch (testError) {
       console.error('Test like endpoint also failed:', testError);
       throw testError;
