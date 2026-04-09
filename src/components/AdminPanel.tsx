@@ -939,7 +939,7 @@ export const AdminPanel = () => {
             </>
           )}
 
-          {activeTab === "categories" && <AdminCategory />}
+          {activeTab === "categories" && <AdminCategory makeAuthenticatedRequest={makeAuthenticatedRequest} />}
           {activeTab === "orders" && <AdminOrders makeAuthenticatedRequest={makeAuthenticatedRequest} />}
 
           {/* Confirm Dialog */}

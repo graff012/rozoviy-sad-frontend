@@ -6,7 +6,11 @@ type Category = {
   name: string;
 };
 
-export const AdminCategory = () => {
+interface AdminCategoryProps {
+  makeAuthenticatedRequest: (url: string, options?: RequestInit) => Promise<Response>;
+}
+
+export const AdminCategory = ({ makeAuthenticatedRequest }: AdminCategoryProps) => {
   // State
   const [categories, setCategories] = useState<Category[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -17,9 +21,7 @@ export const AdminCategory = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/categories`, {
-        credentials: "include",
-      });
+      const res = await makeAuthenticatedRequest(`${API_URL}/categories`);
 
       if (!res.ok) {
         console.error("Failed to fetch categories", res.status);
@@ -59,10 +61,9 @@ export const AdminCategory = () => {
     try {
       if (editingId) {
         // Update
-        const res = await fetch(`${API_URL}/categories/${editingId}`, {
+        const res = await makeAuthenticatedRequest(`${API_URL}/categories/${editingId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          credentials: "include",
           body: JSON.stringify({ name: inputValue }),
         });
 
@@ -75,10 +76,9 @@ export const AdminCategory = () => {
         setEditingId(null);
       } else {
         // Create — Changed URL from /create to /categories
-        const res = await fetch(`${API_URL}/categories/create`, {
+        const res = await makeAuthenticatedRequest(`${API_URL}/categories/create`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include",
           body: JSON.stringify({ name: inputValue }),
         });
 
@@ -110,9 +110,8 @@ export const AdminCategory = () => {
     }
 
     try {
-      const res = await fetch(`${API_URL}/categories/${id}`, {
+      const res = await makeAuthenticatedRequest(`${API_URL}/categories/${id}`, {
         method: "DELETE",
-        credentials: "include",
       });
       if (res.ok) {
         await fetchCategories();
