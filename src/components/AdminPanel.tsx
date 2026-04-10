@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { IoFlowerOutline } from "react-icons/io5";
 import { BiCategory } from "react-icons/bi";
 import { MdBorderColor } from "react-icons/md";
+import { FiUser } from "react-icons/fi";
 import { AdminCategory } from "./AdminCategory";
 import { AdminOrders } from "./AdminOrders";
 import { API_URL, BASE_URL } from "../config";
@@ -26,7 +27,7 @@ type Flower = {
 
 export const AdminPanel = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"flowers" | "categories" | "orders">("flowers");
+  const [activeTab, setActiveTab] = useState<"flowers" | "categories" | "orders" | "account">("flowers");
   const [formData, setFormData] = useState<Omit<Flower, "id"> & { imageFile: File | null }>({
     name: "",
     smell: "",
@@ -44,6 +45,32 @@ export const AdminPanel = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [flowerIdToDelete, setFlowerIdToDelete] = useState<string | null>(null);
+
+  // Profile state
+  type AdminProfile = {
+    id: string;
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+    password: string;
+  };
+  const [profile, setProfile] = useState<AdminProfile>({
+    id: "",
+    first_name: "",
+    last_name: "",
+    phone_number: "",
+    password: "",
+  });
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileFormData, setProfileFormData] = useState<AdminProfile>({
+    id: "",
+    first_name: "",
+    last_name: "",
+    phone_number: "",
+    password: "",
+  });
 
   // Helper function to construct image URL
   const getImageUrl = (imgUrl: string) => {
@@ -101,7 +128,12 @@ export const AdminPanel = () => {
         console.log("Authentication failed during request");
 
         // Only log out for critical endpoints, not orders
-        if (url.includes('/flowers') || url.includes('/categories') || url.includes('/auth/')) {
+        if (
+          url.includes('/flowers') ||
+          url.includes('/categories') ||
+          url.includes('/auth/') ||
+          url.includes('/users/')
+        ) {
           console.log("Critical auth failure, logging out");
           setIsAuthenticated(false);
           document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -255,6 +287,125 @@ export const AdminPanel = () => {
       sessionStorage.removeItem('adminLoginSuccess');
       navigate("/", { replace: true });
     }
+  };
+
+  // Fetch current admin profile
+  const fetchProfile = async () => {
+    try {
+      setProfileLoading(true);
+      const res = await makeAuthenticatedRequest(`${API_URL}/auth/me`);
+      if (res.ok) {
+        const data = await res.json();
+        setProfile({
+          id: data.id,
+          first_name: data.first_name || "",
+          last_name: data.last_name || "",
+          phone_number: data.phone_number || "",
+          password: "",
+        });
+        setProfileFormData({
+          id: data.id,
+          first_name: data.first_name || "",
+          last_name: data.last_name || "",
+          phone_number: data.phone_number || "",
+          password: "",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  // Handle profile save
+  const handleProfileSave = async () => {
+    if (!profileFormData.first_name.trim() || !profileFormData.last_name.trim() || !profileFormData.phone_number.trim()) {
+      alert("Пожалуйста, заполните все обязательные поля");
+      return;
+    }
+
+    if (profileFormData.password && profileFormData.password.length < 6) {
+      alert("Пароль должен содержать минимум 6 символов");
+      return;
+    }
+
+    try {
+      setProfileSaving(true);
+
+      const body: Record<string, string> = {
+        first_name: profileFormData.first_name.trim(),
+        last_name: profileFormData.last_name.trim(),
+        phone_number: profileFormData.phone_number.trim(),
+      };
+
+      if (profileFormData.password) {
+        body.password = profileFormData.password;
+      }
+
+      const res = await makeAuthenticatedRequest(`${API_URL}/users/${profileFormData.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (res.ok) {
+        const updated = await res.json();
+        setProfile({
+          id: updated.id || profileFormData.id,
+          first_name: updated.first_name || profileFormData.first_name,
+          last_name: updated.last_name || profileFormData.last_name,
+          phone_number: updated.phone_number || profileFormData.phone_number,
+          password: "",
+        });
+        setProfileFormData((prev) => ({
+          ...prev,
+          first_name: updated.first_name || prev.first_name,
+          last_name: updated.last_name || prev.last_name,
+          phone_number: updated.phone_number || prev.phone_number,
+          password: "",
+        }));
+        setIsEditingProfile(false);
+        alert("Профиль успешно обновлён!");
+      } else {
+        const errorText = await res.text();
+        console.error("Failed to update profile:", res.status, errorText);
+        alert(`Ошибка при обновлении профиля: ${res.status}`);
+      }
+    } catch (error) {
+      if (error instanceof Error && error.message !== "Authentication failed") {
+        console.error("Error updating profile:", error);
+        alert("Ошибка при обновлении профиля");
+      }
+    } finally {
+      setProfileSaving(false);
+    }
+  };
+
+  // Handle profile cancel
+  const handleProfileCancel = () => {
+    setProfileFormData({
+      id: profile.id,
+      first_name: profile.first_name,
+      last_name: profile.last_name,
+      phone_number: profile.phone_number,
+      password: "",
+    });
+    setIsEditingProfile(false);
+  };
+
+  // Handle profile edit click
+  const handleProfileEdit = () => {
+    setProfileFormData({
+      id: profile.id,
+      first_name: profile.first_name,
+      last_name: profile.last_name,
+      phone_number: profile.phone_number,
+      password: "",
+    });
+    setIsEditingProfile(true);
   };
 
   // Handle form changes
@@ -543,6 +694,7 @@ export const AdminPanel = () => {
     if (isAuthenticated === true) {
       fetchCategories();
       fetchFlowers();
+      fetchProfile();
     }
   }, [isAuthenticated]);
 
@@ -583,6 +735,7 @@ export const AdminPanel = () => {
               { name: "Gullar", icon: IoFlowerOutline, tab: "flowers" },
               { name: "Kategoriyalar", icon: BiCategory, tab: "categories" },
               { name: "Buyurtmalar", icon: MdBorderColor, tab: "orders" },
+              { name: "Аккаунт", icon: FiUser, tab: "account" },
             ].map((item) => (
               <button
                 key={item.tab}
@@ -913,6 +1066,121 @@ export const AdminPanel = () => {
 
           {activeTab === "categories" && <AdminCategory makeAuthenticatedRequest={makeAuthenticatedRequest} />}
           {activeTab === "orders" && <AdminOrders makeAuthenticatedRequest={makeAuthenticatedRequest} />}
+
+          {activeTab === "account" && (
+            <>
+              <h2 className="text-xl sm:text-2xl font-semibold mb-2 font-[Chillax] text-black">
+                Управление аккаунтом
+              </h2>
+
+              <div className="bg-white p-5 sm:p-6 rounded-lg shadow border border-[#f0e5ef]">
+                <h3 className="text-lg font-semibold mb-4 text-black">
+                  Данные профиля
+                </h3>
+
+                {profileLoading ? (
+                  <div className="text-center py-4">
+                    <div className="text-gray-600">Загрузка профиля...</div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">
+                        Имя *
+                      </label>
+                      <input
+                        type="text"
+                        value={isEditingProfile ? profileFormData.first_name : profile.first_name}
+                        onChange={(e) =>
+                          isEditingProfile &&
+                          setProfileFormData((prev) => ({ ...prev, first_name: e.target.value }))
+                        }
+                        disabled={!isEditingProfile}
+                        className="w-full border border-[#e7d6e0] rounded py-2 px-3 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#f2b5d4] disabled:bg-gray-100 disabled:text-gray-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">
+                        Фамилия *
+                      </label>
+                      <input
+                        type="text"
+                        value={isEditingProfile ? profileFormData.last_name : profile.last_name}
+                        onChange={(e) =>
+                          isEditingProfile &&
+                          setProfileFormData((prev) => ({ ...prev, last_name: e.target.value }))
+                        }
+                        disabled={!isEditingProfile}
+                        className="w-full border border-[#e7d6e0] rounded py-2 px-3 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#f2b5d4] disabled:bg-gray-100 disabled:text-gray-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">
+                        Номер телефона *
+                      </label>
+                      <input
+                        type="text"
+                        value={isEditingProfile ? profileFormData.phone_number : profile.phone_number}
+                        onChange={(e) =>
+                          isEditingProfile &&
+                          setProfileFormData((prev) => ({ ...prev, phone_number: e.target.value }))
+                        }
+                        disabled={!isEditingProfile}
+                        className="w-full border border-[#e7d6e0] rounded py-2 px-3 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#f2b5d4] disabled:bg-gray-100 disabled:text-gray-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">
+                        Новый пароль (оставьте пустым, чтобы не менять)
+                      </label>
+                      <input
+                        type="password"
+                        value={isEditingProfile ? profileFormData.password : "••••••••"}
+                        onChange={(e) =>
+                          isEditingProfile &&
+                          setProfileFormData((prev) => ({ ...prev, password: e.target.value }))
+                        }
+                        disabled={!isEditingProfile}
+                        placeholder="Минимум 6 символов"
+                        className="w-full border border-[#e7d6e0] rounded py-2 px-3 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#f2b5d4] disabled:bg-gray-100 disabled:text-gray-500"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {isEditingProfile ? (
+                    <>
+                      <button
+                        onClick={handleProfileSave}
+                        disabled={profileSaving}
+                        className="bg-[#f2b5d4] hover:bg-[#e7a3c4] disabled:bg-gray-300 disabled:cursor-not-allowed text-black font-semibold py-2 px-6 rounded shadow transition text-center"
+                      >
+                        {profileSaving ? "Сохранение..." : "Сохранить"}
+                      </button>
+                      <button
+                        onClick={handleProfileCancel}
+                        disabled={profileSaving}
+                        className="bg-gray-200 hover:bg-gray-300 text-black font-semibold py-2 px-6 rounded shadow transition text-center"
+                      >
+                        Отменить
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={handleProfileEdit}
+                      className="bg-[#f2b5d4] hover:bg-[#e7a3c4] text-black font-semibold py-2 px-6 rounded shadow transition text-center"
+                    >
+                      Редактировать
+                    </button>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Confirm Dialog */}
           {showConfirmDialog && (
