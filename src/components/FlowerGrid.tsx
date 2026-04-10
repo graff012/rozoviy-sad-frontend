@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
-import { API_URL } from "../config";
+import { API_URL, BASE_URL } from "../config";
 
 interface Flower {
   id: string;
@@ -27,6 +27,18 @@ interface FlowerGridProps {
 }
 
 const FlowerGrid = ({ searchTerm, selectedCategoryId }: FlowerGridProps) => {
+  const getImageUrl = (imgUrl: string | null | undefined): string => {
+    if (!imgUrl) return "";
+    if (imgUrl.startsWith("http")) return imgUrl;
+
+    const cleanPath = imgUrl.startsWith("/") ? imgUrl.slice(1) : imgUrl;
+    const imagePath = cleanPath.startsWith("images/")
+      ? cleanPath
+      : `images/${cleanPath}`;
+
+    return `${BASE_URL}/${imagePath}`;
+  };
+
   // Map enum/string smell values to Russian labels for UI only
   const formatSmell = (value: string): string => {
     if (!value) return "";
@@ -189,7 +201,7 @@ const FlowerGrid = ({ searchTerm, selectedCategoryId }: FlowerGridProps) => {
                 <div className="relative overflow-hidden">
                   {flower.imgUrl && !imageErrors[flower.id] ? (
                     <img
-                      src={flower.imgUrl!}
+                      src={getImageUrl(flower.imgUrl)}
                       alt={flower.name}
                       className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                       onLoad={() => console.log("✅ Loaded:", flower.name)}

@@ -300,7 +300,7 @@ export const AdminPanel = () => {
         formDataToSend.append("height", formData.height || "");
         formDataToSend.append("categoryId", formData.categoryId);
         formDataToSend.append("price", formData.price);
-        formDataToSend.append("stock", String(formData.stock));
+        formDataToSend.append("stock", String(stockValue));
 
         if (formData.imageFile) {
           formDataToSend.append("image", formData.imageFile);
@@ -368,6 +368,12 @@ export const AdminPanel = () => {
   const handleUpdate = async () => {
     if (!editingId) return;
 
+    const stockValue = formData.stock === "" ? 0 : parseInt(formData.stock);
+    if (isNaN(stockValue) || stockValue < 0) {
+      alert("Пожалуйста, введите правильное количество (0 или больше)");
+      return;
+    }
+
     const formDataToSend = new FormData();
     formDataToSend.append("name", formData.name);
     formDataToSend.append("price", formData.price);
@@ -375,7 +381,7 @@ export const AdminPanel = () => {
     formDataToSend.append("smell", formData.smell);
     formDataToSend.append("height", formData.height);
     formDataToSend.append("flowerSize", formData.flowerSize);
-    formDataToSend.append("stock", String(formData.stock));
+    formDataToSend.append("stock", String(stockValue));
     if (formData.imageFile) {
       formDataToSend.append("image", formData.imageFile);
     }
