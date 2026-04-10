@@ -11,8 +11,6 @@ import {
 } from "react-icons/fa";
 import { BASE_URL } from "../config";
 
-const TELEGRAM_HANDLE = "@rozoviysaduz";
-
 const getImageUrl = (imgUrl: string | undefined): string => {
   if (!imgUrl) {
     return "/placeholder.jpg";
@@ -209,17 +207,6 @@ const Cart = () => {
                       <span>{cartTotal.toLocaleString()} UZS</span>
                     </div>
                   </div>
-                </div>
-
-                <div className="mt-6 rounded-lg bg-pink-50 border border-pink-100 p-4 text-sm text-gray-700">
-                  <p className="font-semibold text-gray-900 mb-2">
-                    Online to'lov yo'q
-                  </p>
-                  <p>
-                    Mijozlar savatni to'ldirib, skrinshot yoki nusxa olingan
-                    ro'yxatni Telegram orqali yuborishi mumkin:{" "}
-                    <span className="font-semibold">{TELEGRAM_HANDLE}</span>
-                  </p>
                 </div>
 
                 {copyMessage && (
