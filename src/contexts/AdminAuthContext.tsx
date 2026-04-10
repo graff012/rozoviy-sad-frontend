@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
+import { API_URL } from '../config';
 
 interface AdminAuthContextType {
   isAuthenticated: boolean;
@@ -18,14 +19,33 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = sessionStorage.getItem('adminToken') || localStorage.getItem('authToken');
-        if (token) {
-          // You might want to validate the token with the server here
-          setIsAuthenticated(true);
+        const token = sessionStorage.getItem('adminToken');
+        if (!token) {
+          setIsAuthenticated(false);
+          return;
+        }
+
+        const response = await fetch(`${API_URL}/auth/check`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
+            Pragma: 'no-cache',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setIsAuthenticated(response.ok);
+
+        if (!response.ok) {
+          sessionStorage.removeItem('adminToken');
+          sessionStorage.removeItem('adminLoginSuccess');
         }
       } catch (error) {
         console.error('Auth check failed:', error);
         setIsAuthenticated(false);
+        sessionStorage.removeItem('adminToken');
+        sessionStorage.removeItem('adminLoginSuccess');
       } finally {
         setLoading(false);
       }
@@ -34,19 +54,23 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
     checkAuth();
   }, []);
 
+  // Admin login should not survive a page refresh or browser/tab close.
+  useEffect(() => {
+    const clearAdminSession = () => {
+      sessionStorage.removeItem('adminToken');
+      sessionStorage.removeItem('adminLoginSuccess');
+    };
+
+    window.addEventListener('beforeunload', clearAdminSession);
+    return () => window.removeEventListener('beforeunload', clearAdminSession);
+  }, []);
+
   const login = useCallback(async (token: string, onSuccess: () => void) => {
     try {
       setLoading(true);
-      // Store the token in session storage
       sessionStorage.setItem('adminToken', token);
       sessionStorage.setItem('adminLoginSuccess', 'true');
-      // Also store in localStorage for shared API utilities
-      localStorage.setItem('authToken', token);
-      
-      // Set authenticated state
       setIsAuthenticated(true);
-      
-      // Call the success callback
       onSuccess();
     } catch (error) {
       console.error('Login failed:', error);
@@ -58,15 +82,9 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = useCallback((onSuccess: () => void) => {
     try {
-      // Clear auth data from storage
       sessionStorage.removeItem('adminToken');
       sessionStorage.removeItem('adminLoginSuccess');
-      localStorage.removeItem('authToken');
-      
-      // Update state
       setIsAuthenticated(false);
-      
-      // Call the success callback
       onSuccess();
     } catch (error) {
       console.error('Logout failed:', error);

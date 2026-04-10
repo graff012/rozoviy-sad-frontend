@@ -173,8 +173,7 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedReque
 
   // Fallback function if no authenticated request function is provided
   const defaultAuthRequest = async (url: string, options: RequestInit = {}) => {
-    // Prefer admin token from sessionStorage; fallback to localStorage
-    const token = sessionStorage.getItem('adminToken') || localStorage.getItem('authToken');
+    const token = sessionStorage.getItem('adminToken');
 
     // Normalize headers to reliably set Authorization
     const hdrs = new Headers(options.headers as any);
@@ -203,7 +202,6 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ makeAuthenticatedReque
       // Add debugging
       console.log('Fetching orders with auth...');
       console.log('Admin token (sessionStorage):', sessionStorage.getItem('adminToken'));
-      console.log('Auth token (localStorage):', localStorage.getItem('authToken'));
 
       const response = await authRequest(`${API_URL}/orders`, {
         method: "GET",

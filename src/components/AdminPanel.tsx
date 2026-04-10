@@ -77,15 +77,13 @@ export const AdminPanel = () => {
       // Add debugging
       console.log('Request headers:', options.headers);
       console.log('Admin token (sessionStorage):', sessionStorage.getItem('adminToken'));
-      console.log('Auth token (localStorage):', localStorage.getItem('authToken'));
 
       // Normalize headers using Headers API to ensure consistent mutation
       const hdrs = new Headers(options.headers as any);
       hdrs.set('Cache-Control', 'no-cache');
       hdrs.set('Pragma', 'no-cache');
 
-      // Prefer admin token from sessionStorage; fallback to localStorage
-      const token = sessionStorage.getItem('adminToken') || localStorage.getItem('authToken');
+      const token = sessionStorage.getItem('adminToken');
       if (token && !hdrs.has('Authorization')) {
         hdrs.set('Authorization', `Bearer ${token}`);
       }
@@ -107,7 +105,8 @@ export const AdminPanel = () => {
           console.log("Critical auth failure, logging out");
           setIsAuthenticated(false);
           document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-          localStorage.removeItem('authToken');
+          sessionStorage.removeItem('adminToken');
+          sessionStorage.removeItem('adminLoginSuccess');
           navigate("/admin-login", { replace: true });
           throw new Error("Authentication failed");
         }
@@ -127,7 +126,13 @@ export const AdminPanel = () => {
   // Authentication verification
   const verifyAuthentication = async () => {
     try {
-      const token = sessionStorage.getItem('adminToken') || localStorage.getItem('authToken');
+      const token = sessionStorage.getItem('adminToken');
+      if (!token) {
+        setIsAuthenticated(false);
+        navigate("/admin-login", { replace: true });
+        return;
+      }
+
       const response = await fetch(`${API_URL}/auth/check`, {
         method: "GET",
         headers: {
@@ -246,7 +251,8 @@ export const AdminPanel = () => {
       console.error("Logout error:", error);
     } finally {
       setIsAuthenticated(false);
-      localStorage.removeItem('authToken');
+      sessionStorage.removeItem('adminToken');
+      sessionStorage.removeItem('adminLoginSuccess');
       navigate("/", { replace: true });
     }
   };
@@ -520,47 +526,7 @@ export const AdminPanel = () => {
       try {
         console.log("Checking admin authentication...");
 
-        // Check if user has a recent successful login
-        const hasRecentLogin = sessionStorage.getItem("adminLoginSuccess") === "true";
-
-        if (hasRecentLogin) {
-          // User recently logged in, verify their session is still valid
-          await verifyAuthentication();
-          return;
-        }
-
-        // No recent login, check if they have a valid session
-        try {
-          const token = sessionStorage.getItem('adminToken') || localStorage.getItem('authToken');
-          const response = await fetch(`${API_URL}/auth/check`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              'Cache-Control': 'no-cache',
-              'Pragma': 'no-cache',
-              ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            if (data.authenticated === true) {
-              console.log("User has valid session, allowing access");
-              setIsAuthenticated(true);
-              return;
-            }
-          }
-        } catch (authCheckError) {
-          console.error("Auth check failed:", authCheckError);
-        }
-
-        // No valid session found, require fresh login
-        console.log("No valid session, requiring login");
-        setIsAuthenticated(false);
-        navigate("/admin-login", {
-          replace: true,
-          state: { message: "Please login to access admin panel" },
-        });
+        await verifyAuthentication();
 
       } catch (error) {
         console.error("Auth check failed:", error);
