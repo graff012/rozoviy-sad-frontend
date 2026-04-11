@@ -735,7 +735,7 @@ export const AdminPanel = () => {
               { name: "Gullar", icon: IoFlowerOutline, tab: "flowers" },
               { name: "Kategoriyalar", icon: BiCategory, tab: "categories" },
               { name: "Buyurtmalar", icon: MdBorderColor, tab: "orders" },
-              { name: "Аккаунт", icon: FiUser, tab: "account" },
+              { name: "Profile", icon: FiUser, tab: "account" },
             ].map((item) => (
               <button
                 key={item.tab}
